@@ -8,14 +8,26 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <style>
+  :root { --deep:#0B1D3D; --bg:#102A54; --bg-ink:#FFFFFF; --card:#183A6E; --ink:#EAF1FB; --ink2:#D7E4F7; --sub:#AAC3EB; --muted:#8CB4EB; --accent:#FFCD5A; --accent-ink:#3C2D00; --line:#32548C; --good:#78DCAA; --bad:#FF7878; }
+  :root[data-theme="midnight"] { --deep:#000000; --bg:#0A0A0C; --bg-ink:#FFFFFF; --card:#17171C; --ink:#F5F5F7; --ink2:#D8D8DE; --sub:#A7A7B3; --muted:#8E8E99; --accent:#FF3B30; --accent-ink:#FFFFFF; --line:#2C2C33; --good:#5AD08A; --bad:#FF6B62; }
+  :root[data-theme="paper"] { --deep:#E9E2D5; --bg:#F7F3EA; --bg-ink:#23272E; --card:#FFFFFF; --ink:#23272E; --ink2:#3C424C; --sub:#5D6672; --muted:#7A8494; --accent:#1F2937; --accent-ink:#FFFFFF; --line:#DDD5C4; --good:#1E9E6A; --bad:#D64541; }
+  :root[data-theme="sky"] { --deep:#DCE9F7; --bg:#FFFFFF; --bg-ink:#14304F; --card:#F2F7FD; --ink:#14304F; --ink2:#2C4A6B; --sub:#56708F; --muted:#7E97B5; --accent:#1B6AC9; --accent-ink:#FFFFFF; --line:#D3E2F2; --good:#1E9E6A; --bad:#D64541; }
+  :root[data-theme="forest"] { --deep:#07130C; --bg:#0C2013; --bg-ink:#FFFFFF; --card:#14301D; --ink:#EAF7EE; --ink2:#CFE8D6; --sub:#9CC3A8; --muted:#7FA98E; --accent:#FFC94D; --accent-ink:#33270A; --line:#275134; --good:#7FE0A8; --bad:#FF8A7A; }
+  :root[data-theme="plum"] { --deep:#150A24; --bg:#1E1038; --bg-ink:#FFFFFF; --card:#2C1A52; --ink:#F2ECFC; --ink2:#DED2F5; --sub:#BBA8E3; --muted:#9C86CC; --accent:#FF8FB2; --accent-ink:#3D0A22; --line:#452A75; --good:#7FE0A8; --bad:#FF7A6B; }
+  .card, .rowcard, .tile { border: 1px solid var(--line); }
+  .themecard { background:var(--card); border: 2px solid var(--line); border-radius: 14px; padding: 12px; color:var(--ink); font-weight: 700; font-size: 15px; display:flex; align-items:center; gap:10px; cursor:pointer; text-align:left; }
+  .themecard.on { border-color: var(--accent); }
+  .swatch { width: 28px; height: 28px; border-radius: 50%; flex: 0 0 auto; border: 2px solid rgba(127,127,127,.45); }
+  input[type=color] { width: 100%; height: 48px; background:var(--deep); border: 1px solid var(--line); border-radius: 10px; padding: 4px; }
+
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  body { background:#0B1D3D; color:#EAF1FB; font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-  #app { max-width: 480px; margin: 0 auto; background:#102A54; min-height: 100vh; padding: 18px 16px 110px; }
-  h1 { font-size: 15px; letter-spacing: 2px; color:#8CB4EB; font-weight: 700; }
+  body { background:var(--deep); color:var(--ink); font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  #app { max-width: 480px; margin: 0 auto; background:var(--bg); min-height: 100vh; padding: 18px 16px 110px; }
+  h1 { font-size: 15px; letter-spacing: 2px; color:var(--muted); font-weight: 700; }
   .dateline { display:flex; justify-content: space-between; align-items: center; margin-top: 4px; }
-  .date { font-size: 17px; color:#BED2F0; }
-  .chip { background:#FFCD5A; color:#3C2D00; font-weight: 700; font-size: 13px; padding: 6px 12px; border-radius: 999px; border:0; cursor:pointer; }
-  .chip.alt { background:#183A6E; color:#AAC3EB; }
+  .date { font-size: 17px; color:var(--sub); }
+  .chip { background:var(--accent); color:var(--accent-ink); font-weight: 700; font-size: 13px; padding: 6px 12px; border-radius: 999px; border:0; cursor:pointer; }
+  .chip.alt { background:var(--card); color:var(--sub); }
   .focuscard { background:#fff; color:#102A54; border-radius: 22px; padding: 18px; margin-top: 14px; }
   .focuscard .kicker { font-size: 12px; letter-spacing: 1.5px; color:#78828F; font-weight: 700; display:flex; justify-content: space-between; }
   .focuscard .kicker button { background:none; border:0; color:#B07E10; font-weight:700; font-size:12px; cursor:pointer; }
@@ -27,58 +39,58 @@
   .focuscard .why { font-size: 15px; color:#5F6C7D; line-height: 1.35; }
   .focuscard .act { font-size: 15px; font-weight: 700; margin-top: 4px; }
   .forecast { font-size: 15px; color:#A03C28; line-height: 1.35; }
-  .sect { font-size: 13px; letter-spacing: 1.5px; color:#8CB4EB; font-weight: 700; margin: 20px 0 8px; }
-  .rowcard { background:#183A6E; border-radius: 16px; padding: 13px 14px; margin-bottom: 10px; }
+  .sect { font-size: 13px; letter-spacing: 1.5px; color:var(--muted); font-weight: 700; margin: 20px 0 8px; }
+  .rowcard { background:var(--card); border-radius: 16px; padding: 13px 14px; margin-bottom: 10px; }
   .rowcard .t { font-size: 17px; font-weight: 700; }
-  .rowcard .s { font-size: 13px; color:#AAC3EB; margin-top: 2px; }
+  .rowcard .s { font-size: 13px; color:var(--sub); margin-top: 2px; }
   .lt { display:flex; justify-content: space-between; align-items: flex-start; }
   .segs { display:flex; gap: 6px; padding-top: 2px; }
-  .seg { width: 30px; height: 26px; border-radius: 8px; border: 3px solid #96B4E1; background: transparent; cursor: pointer; padding: 0; }
-  .seg.on { background:#FFCD5A; border-color:#FFCD5A; }
-  .segcount { color:#FFCD5A; font-weight: 700; font-size: 13px; text-align: right; margin-top: 4px; }
+  .seg { width: 30px; height: 26px; border-radius: 8px; border: 3px solid var(--muted); background: transparent; cursor: pointer; padding: 0; }
+  .seg.on { background:var(--accent); border-color:var(--accent); }
+  .segcount { color:var(--accent); font-weight: 700; font-size: 13px; text-align: right; margin-top: 4px; }
   .checkrow { display:flex; gap: 12px; align-items: center; cursor: pointer; }
-  .circle { width: 34px; height: 34px; border-radius: 50%; border: 4px solid #A0C3F5; flex: 0 0 auto; display:flex; align-items:center; justify-content:center; font-size: 18px; color:#fff; }
+  .circle { width: 34px; height: 34px; border-radius: 50%; border: 4px solid var(--muted); flex: 0 0 auto; display:flex; align-items:center; justify-content:center; font-size: 18px; color:#fff; }
   .circle.done { background:#14A078; border-color:#14A078; }
   .quicklog { display:flex; gap: 8px; flex-wrap: wrap; }
-  .qbtn { background:#fff; color:#102A54; border:0; font-weight: 700; font-size: 15px; padding: 10px 14px; border-radius: 999px; cursor: pointer; }
-  .qbtn:active { background:#FFCD5A; }
-  .pchip { background:#0B1D3D; color:#D7E4F7; border: 1px solid #32548C; font-weight: 600; font-size: 14px; padding: 9px 12px; border-radius: 999px; cursor: pointer; }
-  .pchip.on { background:#FFCD5A; color:#3C2D00; border-color:#FFCD5A; font-weight: 700; }
+  .qbtn { background:var(--bg); color:var(--bg-ink); border:0; font-weight: 700; font-size: 15px; padding: 10px 14px; border-radius: 999px; cursor: pointer; }
+  .qbtn:active { background:var(--accent); }
+  .pchip { background:var(--deep); color:var(--ink2); border: 1px solid var(--line); font-weight: 600; font-size: 14px; padding: 9px 12px; border-radius: 999px; cursor: pointer; }
+  .pchip.on { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); font-weight: 700; }
   .strip { display:grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-  .tile { background:#183A6E; border-radius: 14px; padding: 9px 10px; }
-  .tile .n { font-size: 12px; color:#AAC3EB; }
+  .tile { background:var(--card); border-radius: 14px; padding: 9px 10px; }
+  .tile .n { font-size: 12px; color:var(--sub); }
   .tile .v { font-size: 16px; font-weight: 700; margin: 2px 0 6px; }
-  .tile .bar { background:#32548C; height: 8px; margin: 0; }
+  .tile .bar { background:var(--line); height: 8px; margin: 0; }
   .bicdots { display:flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
   .bicdot { display:flex; align-items: center; gap: 6px; font-size: 14px; }
   .dot { width: 18px; height: 18px; border-radius: 50%; background:#5F7396; }
-  .dot.g { background:#78DCAA; } .dot.r { background:#FF7878; } .dot.a { background:#FFCD5A; }
-  .monthline { font-size: 14px; color:#AAC3EB; margin-top: 10px; }
-  .tomorrow { font-size: 15px; color:#AAC3EB; margin-top: 14px; }
-  nav { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); width: min(448px, calc(100% - 20px)); background:#183A6E; border-radius: 18px; display:flex; padding: 8px; z-index: 10; box-shadow: 0 6px 24px rgba(0,0,0,.35); }
-  nav button { flex:1; background:none; border:0; color:#8CAAD2; font-size: 15px; font-weight: 600; padding: 10px 0; border-radius: 12px; cursor: pointer; }
-  nav button.on { color:#fff; background:#102A54; }
-  .card { background:#183A6E; border-radius: 16px; padding: 14px; margin-bottom: 12px; }
+  .dot.g { background:#78DCAA; } .dot.r { background:#FF7878; } .dot.a { background:var(--accent); }
+  .monthline { font-size: 14px; color:var(--sub); margin-top: 10px; }
+  .tomorrow { font-size: 15px; color:var(--sub); margin-top: 14px; }
+  nav { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); width: min(448px, calc(100% - 20px)); background:var(--card); border-radius: 18px; display:flex; padding: 8px; z-index: 10; box-shadow: 0 6px 24px rgba(0,0,0,.35); }
+  nav button { flex:1; background:none; border:0; color:var(--sub); font-size: 15px; font-weight: 600; padding: 10px 0; border-radius: 12px; cursor: pointer; }
+  nav button.on { color:var(--bg-ink); background:var(--bg); }
+  .card { background:var(--card); border-radius: 16px; padding: 14px; margin-bottom: 12px; }
   .card h3 { font-size: 18px; margin-bottom: 4px; }
-  .card .sub { font-size: 13px; color:#AAC3EB; line-height: 1.4; }
-  .segbtns { display:flex; background:#0B1D3D; border-radius: 999px; padding: 3px; margin: 10px 0; }
-  .segbtns button { flex:1; background:none; border:0; color:#AAC3EB; font-weight: 700; font-size: 14px; padding: 7px 0; border-radius: 999px; cursor: pointer; }
-  .segbtns button.on { background:#FFCD5A; color:#3C2D00; }
+  .card .sub { font-size: 13px; color:var(--sub); line-height: 1.4; }
+  .segbtns { display:flex; background:var(--deep); border-radius: 999px; padding: 3px; margin: 10px 0; }
+  .segbtns button { flex:1; background:none; border:0; color:var(--sub); font-weight: 700; font-size: 14px; padding: 7px 0; border-radius: 999px; cursor: pointer; }
+  .segbtns button.on { background:var(--accent); color:var(--accent-ink); }
   .vsrow { display:flex; justify-content: space-between; font-size: 14px; margin-top: 8px; }
   .vsrow b { font-size: 16px; }
-  .card .bar { background:#32548C; }
+  .card .bar { background:var(--line); }
   details.card summary { font-size: 18px; font-weight: 700; cursor: pointer; list-style: none; }
   details.card summary::-webkit-details-marker { display:none; }
   details.card ul { margin: 10px 0 2px 18px; }
-  details.card li { font-size: 14px; color:#D7E4F7; line-height: 1.45; margin-bottom: 6px; }
-  label.f { display:block; font-size: 13px; color:#AAC3EB; margin: 10px 0 4px; }
-  input[type=number], input[type=text], input[type=search], input[type=date] { width: 100%; background:#0B1D3D; border: 1px solid #32548C; color:#fff; font-size: 16px; padding: 10px; border-radius: 10px; }
+  details.card li { font-size: 14px; color:var(--ink2); line-height: 1.45; margin-bottom: 6px; }
+  label.f { display:block; font-size: 13px; color:var(--sub); margin: 10px 0 4px; }
+  input[type=number], input[type=text], input[type=search], input[type=date] { width: 100%; background:var(--deep); border: 1px solid var(--line); color:var(--ink); font-size: 16px; padding: 10px; border-radius: 10px; }
   .grid2 { display:grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
-  .bigbtn { background:#FFCD5A; color:#3C2D00; border:0; font-weight: 800; font-size: 16px; width: 100%; padding: 13px; border-radius: 12px; cursor: pointer; margin-top: 14px; }
-  .ghostbtn { background:none; color:#AAC3EB; border: 1px solid #32548C; font-weight: 700; font-size: 14px; padding: 10px 14px; border-radius: 10px; cursor: pointer; }
-  .hist { font-size: 14px; color:#D7E4F7; line-height: 1.5; }
-  .hist b { color:#fff; }
-  .note { font-size: 12px; color:#7E97BC; line-height: 1.4; margin-top: 8px; }
+  .bigbtn { background:var(--accent); color:var(--accent-ink); border:0; font-weight: 800; font-size: 16px; width: 100%; padding: 13px; border-radius: 12px; cursor: pointer; margin-top: 14px; }
+  .ghostbtn { background:none; color:var(--sub); border: 1px solid var(--line); font-weight: 700; font-size: 14px; padding: 10px 14px; border-radius: 10px; cursor: pointer; }
+  .hist { font-size: 14px; color:var(--ink2); line-height: 1.5; }
+  .hist b { color:var(--ink); }
+  .note { font-size: 12px; color:var(--muted); line-height: 1.4; margin-top: 8px; }
   .hidden { display:none; }
 </style>
 </head>
@@ -100,7 +112,7 @@
         <div class="segbtns" id="ltChannel" style="margin:10px 0 0">
           <button data-ch="phone" class="on">📞 Phone</button><button data-ch="email">✉️ Email</button>
         </div>
-        <div class="s" id="ltBreak" style="font-size:13px; color:#AAC3EB; margin-top:6px"></div>
+        <div class="s" id="ltBreak" style="font-size:13px; color:var(--sub); margin-top:6px"></div>
       </div>
       <div class="rowcard checkrow" id="partnerRow"><div class="circle" id="partnerCircle"></div><div><div class="t">Partner intro at 8:30 prep</div><div class="s">decide 1 name every morning</div></div></div>
       <div class="rowcard checkrow" id="bookRow"><div class="circle" id="bookCircle"></div><div><div class="t">Book-before-they-leave</div><div class="s">every appointment ends with the next one booked</div></div></div>
@@ -217,6 +229,33 @@
     </div>
   </section>
 
+  <!-- STYLE -->
+  <section id="tab-style" class="hidden">
+    <h1>STYLE &amp; SETTINGS</h1>
+    <div class="date" style="margin:4px 0 12px">Themes, colours, font size</div>
+    <div class="sect">THEME — TAP TO APPLY</div>
+    <div id="themeGrid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px"></div>
+    <div class="sect">YOUR OWN COLOURS</div>
+    <div class="card">
+      <div class="grid2">
+        <div><label class="f">Background</label><input type="color" id="cBg" value="#102A54"></div>
+        <div><label class="f">Cards</label><input type="color" id="cCard" value="#183A6E"></div>
+        <div><label class="f">Accent</label><input type="color" id="cAccent" value="#FFCD5A"></div>
+        <div><label class="f">&nbsp;</label><button class="bigbtn" id="applyCustom" style="margin-top:0">Use my colours</button></div>
+      </div>
+      <div class="note">Picking a theme above turns custom colours off. Custom colours keep the Ocean layout's text shades, so very light accents can be harder to read — the presets are the safe picks.</div>
+    </div>
+    <div class="sect">FONT SIZE</div>
+    <div class="card">
+      <div class="segbtns" id="fontBtns" style="margin:0">
+        <button data-fs="0.9">Compact</button><button data-fs="1">Normal</button><button data-fs="1.12">Large</button><button data-fs="1.25">XL</button><button data-fs="1.4">XXL</button>
+      </div>
+      <div style="margin-top:14px; font-size:17px; font-weight:700">Preview: 28 of 30 appointments held</div>
+      <div class="sub" style="margin-top:4px">The whole app grows or shrinks together — nothing overflows its box.</div>
+    </div>
+    <div class="note">Theme, colours and font size are saved on this phone and apply everywhere in the app, right away.</div>
+  </section>
+
   <!-- RULES -->
   <section id="tab-rules" class="hidden">
     <h1>RULES</h1>
@@ -232,6 +271,7 @@
   <button data-tab="plan">Plan</button>
   <button data-tab="log">Log</button>
   <button data-tab="rules">Rules</button>
+  <button data-tab="style">Style</button>
 </nav>
 
 <script>
@@ -353,7 +393,15 @@ const WRAP_ITEMS = [
 /* ============ STATE ============ */
 const KEY = "workgrowth_v1";
 function defState(){ return { weeks:{}, months:{}, days:{}, srfs:[], appts:[], bookedAhead:4,
-  focusOverride:null, modeOverride:null, ltChannel:"phone", tf:"m" }; }
+  focusOverride:null, modeOverride:null, ltChannel:"phone", tf:"m",
+  theme:"ocean", custom:{ bg:"#102A54", card:"#183A6E", accent:"#FFCD5A" }, fontScale:1 }; }
+const THEMES = [
+  { id:"ocean", name:"Ocean", bg:"#102A54", accent:"#FFCD5A" },
+  { id:"midnight", name:"Midnight", bg:"#0A0A0C", accent:"#FF3B30" },
+  { id:"paper", name:"Paper", bg:"#F7F3EA", accent:"#1F2937" },
+  { id:"sky", name:"Sky", bg:"#FFFFFF", accent:"#1B6AC9" },
+  { id:"forest", name:"Forest", bg:"#0C2013", accent:"#FFC94D" },
+  { id:"plum", name:"Plum", bg:"#1E1038", accent:"#FF8FB2" } ];
 const PRODUCTS = [
   { id:"pac_new", label:"New PAC", cat:"si" }, { id:"pac_inc", label:"PAC increase", cat:"si" },
   { id:"savings", label:"Savings account", cat:"si" }, { id:"nomi", label:"NOMI Find & Save", cat:"si" },
@@ -469,7 +517,7 @@ function renderHome(){ const mode = curMode(), day = dy(), w = wk();
   const tiles = [ ["Held", (+w.held||0)+" / 30", (+w.held||0)/30], ["S&I", (+w.si||0)+" / 6", (+w.si||0)/6],
     ["MyAdvisor", (+w.myadvisor||0)+" / 12", (+w.myadvisor||0)/12], ["Volume", fmtK(w.volume), (+w.volume||0)/769231],
     ["Referrals", (+w.initiated||0)+" / 5", (+w.initiated||0)/5] ];
-  $("weekStrip").innerHTML = tiles.map(t => '<div class="tile"><div class="n">'+t[0]+'</div><div class="v">'+t[1]+'</div><div class="bar"><div class="'+(t[2] >= 0.6 ? "green" : "")+'" style="width:'+Math.min(100, Math.max(0, t[2]*100))+'%; background:'+(t[2] >= 0.6 ? "#78DCAA" : "#FF7878")+'"></div></div></div>').join("");
+  $("weekStrip").innerHTML = tiles.map(t => '<div class="tile"><div class="n">'+t[0]+'</div><div class="v">'+t[1]+'</div><div class="bar"><div class="'+(t[2] >= 0.6 ? "green" : "")+'" style="width:'+Math.min(100, Math.max(0, t[2]*100))+'%; background:'+(t[2] >= 0.6 ? "var(--good)" : "var(--bad)")+'"></div></div></div>').join("");
   // road to BIC (completed weeks/months only)
   const dots = [ ["Appts", avgField(S.weeks, "held", true), 20], ["S&I", avgField(S.weeks, "si", true), 3.69],
     ["Cards", avgField(S.months, "cards", false), 1.67], ["Loans", avgField(S.months, "loans", false), 1.5],
@@ -497,8 +545,8 @@ function renderTargets(){ const tf = S.tf;
   $("targetCards").innerHTML = TARGETS.map(t => { const ours = t.oursNum[tf], bic = t.bicNum[tf];
     const scale = Math.max(ours, bic) || 1;
     return '<div class="card"><h3>'+esc(t.name)+'</h3><div class="sub">'+esc(t.mult)+'</div>'
-      + '<div class="vsrow"><span>OUR TARGET</span><b>'+esc(t.ours[tf])+'</b></div><div class="bar"><div style="width:'+(ours/scale*100)+'%; background:#FFCD5A"></div></div>'
-      + '<div class="vsrow"><span>BIC NEEDED</span><b>'+esc(t.bic[tf])+'</b></div><div class="bar"><div style="width:'+(bic/scale*100)+'%; background:#8CB4EB"></div></div>'
+      + '<div class="vsrow"><span>OUR TARGET</span><b>'+esc(t.ours[tf])+'</b></div><div class="bar"><div style="width:'+(ours/scale*100)+'%; background:var(--accent)"></div></div>'
+      + '<div class="vsrow"><span>BIC NEEDED</span><b>'+esc(t.bic[tf])+'</b></div><div class="bar"><div style="width:'+(bic/scale*100)+'%; background:var(--muted)"></div></div>'
       + '<div class="sub" style="margin-top:8px">'+esc(t.note)+'</div></div>'; }).join(""); }
 
 /* ============ RENDER: PLAN ============ */
@@ -538,11 +586,34 @@ function renderRules(){ const q = ($("ruleSearch").value || "").toLowerCase();
   const list = RULES.filter(r => !q || (r.t+" "+r.s).toLowerCase().includes(q));
   $("ruleList").innerHTML = list.length ? list.map(r => '<div class="card"><h3 style="font-size:16px">'+esc(r.t)+'</h3><div class="sub">'+esc(r.s)+'</div></div>').join("") : '<div class="sub">No rule matches that search.</div>'; }
 
+/* ============ STYLE: THEMES + FONT ============ */
+function applyTheme(){ const root = document.documentElement;
+  ["--bg","--deep","--card","--accent"].forEach(v => root.style.removeProperty(v));
+  let bgForMeta = null;
+  if (S.theme === "custom" && S.custom) { root.dataset.theme = "ocean";
+    root.style.setProperty("--bg", S.custom.bg); root.style.setProperty("--deep", S.custom.bg);
+    root.style.setProperty("--card", S.custom.card); root.style.setProperty("--accent", S.custom.accent);
+    bgForMeta = S.custom.bg;
+  } else { root.dataset.theme = S.theme || "ocean";
+    const t = THEMES.find(x => x.id === root.dataset.theme); bgForMeta = t ? t.bg : "#102A54"; }
+  const meta = document.querySelector('meta[name="theme-color"]'); if (meta && bgForMeta) meta.setAttribute("content", bgForMeta); }
+function applyFont(){ document.body.style.zoom = String(S.fontScale || 1); }
+function renderStyle(){
+  $("themeGrid").innerHTML = THEMES.map(t => '<button class="themecard'+(S.theme === t.id ? " on" : "")+'" data-theme="'+t.id+'"><span class="swatch" style="background:linear-gradient(135deg, '+t.bg+' 50%, '+t.accent+' 50%)"></span>'+t.name+'</button>').join("")
+    + '<button class="themecard'+(S.theme === "custom" ? " on" : "")+'" data-theme="custom"><span class="swatch" style="background:linear-gradient(135deg, '+(S.custom ? S.custom.bg : "#102A54")+' 50%, '+(S.custom ? S.custom.accent : "#FFCD5A")+' 50%)"></span>Custom</button>';
+  document.querySelectorAll("#themeGrid .themecard").forEach(b => b.onclick = () => { S.theme = b.dataset.theme; save(); applyTheme(); renderStyle(); });
+  if (S.custom) { $("cBg").value = S.custom.bg; $("cCard").value = S.custom.card; $("cAccent").value = S.custom.accent; }
+  document.querySelectorAll("#fontBtns button").forEach(b => { b.classList.toggle("on", Math.abs(parseFloat(b.dataset.fs) - (S.fontScale || 1)) < 0.01);
+    b.onclick = () => { S.fontScale = parseFloat(b.dataset.fs); save(); applyFont(); renderStyle(); }; }); }
+$("applyCustom").onclick = () => { S.custom = { bg: $("cBg").value, card: $("cCard").value, accent: $("cAccent").value };
+  S.theme = "custom"; save(); applyTheme(); renderStyle(); };
+
 /* ============ EVENTS ============ */
 document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x === b));
-  ["home","targets","plan","log","rules"].forEach(t => $("tab-"+t).classList.toggle("hidden", t !== b.dataset.tab));
+  ["home","targets","plan","log","rules","style"].forEach(t => $("tab-"+t).classList.toggle("hidden", t !== b.dataset.tab));
   if (b.dataset.tab === "log") renderLog(); if (b.dataset.tab === "targets") renderTargets();
+  if (b.dataset.tab === "style") renderStyle();
   window.scrollTo(0,0); });
 $("modeChip").onclick = () => { const order = [null,"prep","focus","wrap"]; const i = order.indexOf(S.modeOverride);
   S.modeOverride = order[(i+1) % order.length]; save(); renderHome(); };
@@ -603,7 +674,8 @@ $("importFile").addEventListener("change", ev => { const file = ev.target.files[
 
 /* ============ INIT ============ */
 wk(); mo(); dy(); syncDayTouches(); save();
-renderHome(); renderTargets(); renderPlan(); renderLog(); renderRules();
+applyTheme(); applyFont();
+renderHome(); renderTargets(); renderPlan(); renderLog(); renderRules(); renderStyle();
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
 </script>
 </body>
