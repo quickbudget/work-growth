@@ -42,6 +42,8 @@
   .quicklog { display:flex; gap: 8px; flex-wrap: wrap; }
   .qbtn { background:#fff; color:#102A54; border:0; font-weight: 700; font-size: 15px; padding: 10px 14px; border-radius: 999px; cursor: pointer; }
   .qbtn:active { background:#FFCD5A; }
+  .pchip { background:#0B1D3D; color:#D7E4F7; border: 1px solid #32548C; font-weight: 600; font-size: 14px; padding: 9px 12px; border-radius: 999px; cursor: pointer; }
+  .pchip.on { background:#FFCD5A; color:#3C2D00; border-color:#FFCD5A; font-weight: 700; }
   .strip { display:grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
   .tile { background:#183A6E; border-radius: 14px; padding: 9px 10px; }
   .tile .n { font-size: 12px; color:#AAC3EB; }
@@ -105,7 +107,7 @@
 
       <div class="sect">LOG IT IN 2 TAPS</div>
       <div class="quicklog">
-        <button class="qbtn" data-q="held">+ Appt held</button>
+        <button class="qbtn" data-q="appt">+ Appointment</button>
         <button class="qbtn" data-q="si">+ S&amp;I</button>
         <button class="qbtn" data-q="initiated">+ Referral</button>
         <button class="qbtn" data-q="volume">+ Volume</button>
@@ -131,6 +133,19 @@
       </div>
       <button class="bigbtn" id="srfSave">Save SRF</button>
       <div class="note" id="srfToday"></div>
+    </div>
+
+    <div class="rowcard hidden" id="apptForm" style="margin-top:10px">
+      <div class="t" style="font-size:16px">Appointment — attach the products to the SRF</div>
+      <div class="s">What got done in this appointment? Every product you tap counts toward its target by itself — no double logging.</div>
+      <label class="f">Client SRF number</label>
+      <input type="text" id="apptSrf" inputmode="numeric" placeholder="e.g. 123456789">
+      <label class="f">Products done in this appointment</label>
+      <div id="apptProducts" style="display:flex; flex-wrap:wrap; gap:8px"></div>
+      <label class="f">Volume $ from this appointment (optional)</label>
+      <input type="number" id="apptVolume" min="0" step="100" placeholder="0">
+      <button class="bigbtn" id="apptSave">Save appointment</button>
+      <div class="note">Saving counts: held +1 · each S&amp;I product +1 S&amp;I · MyAdvisor +1 · each referral product +1 initiated · card / loan / risk +1 to this month (manual only, as always).</div>
     </div>
 
     <div class="sect">THIS WEEK — ALL OF IT</div>
@@ -337,8 +352,18 @@ const WRAP_ITEMS = [
 "use strict";
 /* ============ STATE ============ */
 const KEY = "workgrowth_v1";
-function defState(){ return { weeks:{}, months:{}, days:{}, srfs:[], bookedAhead:4,
+function defState(){ return { weeks:{}, months:{}, days:{}, srfs:[], appts:[], bookedAhead:4,
   focusOverride:null, modeOverride:null, ltChannel:"phone", tf:"m" }; }
+const PRODUCTS = [
+  { id:"pac_new", label:"New PAC", cat:"si" }, { id:"pac_inc", label:"PAC increase", cat:"si" },
+  { id:"savings", label:"Savings account", cat:"si" }, { id:"nomi", label:"NOMI Find & Save", cat:"si" },
+  { id:"gic", label:"New GIC", cat:"si" }, { id:"di", label:"Direct Investing", cat:"si" },
+  { id:"myadvisor", label:"MyAdvisor done", cat:"myadvisor" },
+  { id:"card", label:"Credit card (manual)", cat:"cards" }, { id:"loan", label:"Loan (manual)", cat:"loans" },
+  { id:"risk", label:"Risk / insurance", cat:"risk" },
+  { id:"ref_ms", label:"Referral → MS", cat:"initiated" }, { id:"ref_fp", label:"Referral → FP/IRP", cat:"initiated" } ];
+const apptSel = new Set();
+function prodLabel(id){ const p = PRODUCTS.find(x => x.id === id); return p ? p.label : id; }
 function load(){ try { const raw = localStorage.getItem(KEY); if (raw) return Object.assign(defState(), JSON.parse(raw)); } catch(e){}
   const s = defState();
   s.weeks["2026-11-02"] = { held:28, booked:null, touches:null, si:null, initiated:null, linked:null, myadvisor:null, volume:281000, seeded:true };
@@ -505,7 +530,8 @@ function renderLog(){ const w = wk(), m = mo();
     if (v.closed != null) parts.push("Closed <b>"+v.closed+"</b>");
     return "<b>"+esc(k)+"</b> — " + (parts.length ? parts.join(" · ") : "nothing logged"); }).join("<br>");
   const sl = S.srfs.slice(-10).reverse().map(x => esc(x.date)+" · SRF <b>"+esc(x.srf)+"</b> · "+esc(x.kind)).join("<br>");
-  $("history").innerHTML = wl + (ml ? "<br><br>"+ml : "") + (sl ? "<br><br>Recent SRFs:<br>"+sl : ""); }
+  const al = (S.appts || []).slice(-8).reverse().map(a => esc(a.date)+" · SRF <b>"+esc(a.srf)+"</b> — "+a.products.map(prodLabel).map(esc).join(", ")+(a.volume ? " · <b>"+fmtK(a.volume)+"</b>" : "")).join("<br>");
+  $("history").innerHTML = wl + (ml ? "<br><br>"+ml : "") + (al ? "<br><br>Appointments &amp; their products:<br>"+al : "") + (sl ? "<br><br>Recent SRFs:<br>"+sl : ""); }
 
 /* ============ RENDER: RULES ============ */
 function renderRules(){ const q = ($("ruleSearch").value || "").toLowerCase();
@@ -520,8 +546,30 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   window.scrollTo(0,0); });
 $("modeChip").onclick = () => { const order = [null,"prep","focus","wrap"]; const i = order.indexOf(S.modeOverride);
   S.modeOverride = order[(i+1) % order.length]; save(); renderHome(); };
+function renderApptProducts(){ $("apptProducts").innerHTML = PRODUCTS.map(p => '<button class="pchip'+(apptSel.has(p.id) ? " on" : "")+'" data-p="'+p.id+'">'+esc(p.label)+'</button>').join("");
+  document.querySelectorAll("#apptProducts .pchip").forEach(c => c.onclick = () => { const id = c.dataset.p;
+    if (apptSel.has(id)) apptSel.delete(id); else apptSel.add(id); renderApptProducts(); }); }
+$("apptSave").onclick = () => { const srf = $("apptSrf").value.trim();
+  if (!srf) { alert("Add the client SRF first — the products attach to it."); return; }
+  if (!apptSel.size) { alert("Tap at least one product done in this appointment."); return; }
+  const vol = numOrNull($("apptVolume").value) || 0;
+  const rec = { date: dstr(new Date()), srf: srf, products: Array.from(apptSel), volume: vol };
+  S.appts.push(rec);
+  const w = wk(), m = mo(); w.held = (+w.held||0)+1;
+  const counts = { si:0, myadvisor:0, initiated:0, cards:0, loans:0, risk:0 };
+  rec.products.forEach(id => { const p = PRODUCTS.find(x => x.id === id); if (p && counts[p.cat] !== undefined) counts[p.cat]++; });
+  w.si = (+w.si||0)+counts.si; w.myadvisor = (+w.myadvisor||0)+counts.myadvisor; w.initiated = (+w.initiated||0)+counts.initiated;
+  m.cards = (+m.cards||0)+counts.cards; m.loans = (+m.loans||0)+counts.loans; m.risk = (+m.risk||0)+counts.risk;
+  if (vol) w.volume = (+w.volume||0)+vol;
+  if (!S.srfs.some(x => x.date === rec.date && x.srf === srf)) S.srfs.push({ date: rec.date, srf: srf, kind: "Appointment" });
+  const bits = ["Held +1"]; if (counts.si) bits.push("S&I +"+counts.si); if (counts.myadvisor) bits.push("MyAdvisor +1");
+  if (counts.initiated) bits.push("Initiated +"+counts.initiated); if (counts.cards) bits.push("Cards +1");
+  if (counts.loans) bits.push("Loans +1"); if (counts.risk) bits.push("Risk +1"); if (vol) bits.push("Volume +"+fmtK(vol));
+  apptSel.clear(); $("apptSrf").value = ""; $("apptVolume").value = ""; renderApptProducts();
+  $("apptForm").classList.add("hidden"); save(); renderHome(); renderLog();
+  alert("Appointment saved for SRF "+srf+" — "+bits.join(" · ")); };
 document.querySelectorAll("[data-q]").forEach(b => b.onclick = () => { const w = wk(); const q = b.dataset.q;
-  if (q === "held") w.held = (+w.held||0)+1;
+  if (q === "appt") { $("apptForm").classList.toggle("hidden"); renderApptProducts(); return; }
   if (q === "si") w.si = (+w.si||0)+1;
   if (q === "initiated") w.initiated = (+w.initiated||0)+1;
   if (q === "booked") S.bookedAhead = (+S.bookedAhead||0)+1;
