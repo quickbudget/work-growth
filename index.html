@@ -126,6 +126,8 @@
         <button class="qbtn" data-q="booked">+ Booked</button>
         <button class="qbtn" data-q="srf">+ SRF</button>
       </div>
+      <button class="ghostbtn" id="undoBtn" style="width:100%; margin-top:10px">↩ Undo last tap</button>
+      <div class="note" id="undoNote"></div>
     </div>
 
     <div id="wrapBlock" class="hidden">
@@ -217,7 +219,7 @@
       <button class="bigbtn" id="saveMonth">Save month</button>
       <div class="note">Pre-approved cards and loans are served to the client but logged as zero here — they do not count toward these benchmarks.</div>
     </div>
-    <div class="card"><h3>History</h3><div class="hist" id="history"></div></div>
+    <div class="card"><h3>History</h3><div class="note" style="margin-bottom:8px">Fixing a mistake: week and month numbers — edit the form above and save again, it overwrites. A wrong tap — Undo on Home. A wrong appointment or SRF — Delete it here.</div><div class="hist" id="history"></div></div>
     <div class="card">
       <h3>Your data</h3>
       <div class="sub">Everything is stored only on this phone, in this browser. Export a backup before switching phones or clearing browser data.</div>
@@ -394,7 +396,7 @@ const WRAP_ITEMS = [
 const KEY = "workgrowth_v1";
 function defState(){ return { weeks:{}, months:{}, days:{}, srfs:[], appts:[], bookedAhead:4,
   focusOverride:null, modeOverride:null, ltChannel:"phone", tf:"m",
-  theme:"ocean", custom:{ bg:"#102A54", card:"#183A6E", accent:"#FFCD5A" }, fontScale:1 }; }
+  theme:"ocean", custom:{ bg:"#102A54", card:"#183A6E", accent:"#FFCD5A" }, fontScale:1, undo:[] }; }
 const THEMES = [
   { id:"ocean", name:"Ocean", bg:"#102A54", accent:"#FFCD5A" },
   { id:"midnight", name:"Midnight", bg:"#0A0A0C", accent:"#FF3B30" },
@@ -419,6 +421,38 @@ function load(){ try { const raw = localStorage.getItem(KEY); if (raw) return Ob
   return s; }
 let S = load();
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+function uid(){ return Date.now().toString(36) + Math.floor(Math.random()*1e6).toString(36); }
+function normalize(){ if (!Array.isArray(S.undo)) S.undo = [];
+  (S.appts || []).forEach((a, i) => { if (!a.id) a.id = "legacy-a" + i; });
+  (S.srfs || []).forEach((x, i) => { if (!x.id) x.id = "legacy-s" + i; }); }
+normalize();
+function wByKey(k){ if (!S.weeks[k]) S.weeks[k] = { held:0, booked:0, touches:0, si:0, initiated:0, linked:0, myadvisor:0, volume:0 }; return S.weeks[k]; }
+function mByKey(k){ if (!S.months[k]) S.months[k] = { cards:0, loans:0, risk:0, closed:0 }; return S.months[k]; }
+function pushUndo(u){ S.undo.push(u); if (S.undo.length > 60) S.undo.splice(0, S.undo.length - 60); }
+function describeUndo(u){ return ({ si:"+1 S&I", initiated:"+1 initiated referral", booked:"+1 booked ahead",
+  volume:"+$" + (u.amt || 0).toLocaleString("en-CA") + " volume", srf:"SRF " + u.srf,
+  appt:"Appointment " + u.srf + " (" + (u.n || 0) + " products)" })[u.k] || "a tap"; }
+function reverseAppt(a){ const wkK = a.wk || dstr(mondayOf(new Date(a.date + "T12:00:00"))), mkK = a.mk || String(a.date).slice(0, 7);
+  const w = wByKey(wkK), m = mByKey(mkK);
+  w.held = Math.max(0, (+w.held || 0) - 1);
+  const counts = { si:0, myadvisor:0, initiated:0, cards:0, loans:0, risk:0 };
+  (a.products || []).forEach(id => { const p = PRODUCTS.find(x => x.id === id); if (p && counts[p.cat] !== undefined) counts[p.cat]++; });
+  w.si = Math.max(0, (+w.si || 0) - counts.si); w.myadvisor = Math.max(0, (+w.myadvisor || 0) - counts.myadvisor);
+  w.initiated = Math.max(0, (+w.initiated || 0) - counts.initiated);
+  m.cards = Math.max(0, (+m.cards || 0) - counts.cards); m.loans = Math.max(0, (+m.loans || 0) - counts.loans);
+  m.risk = Math.max(0, (+m.risk || 0) - counts.risk);
+  if (a.volume) w.volume = Math.max(0, (+w.volume || 0) - a.volume);
+  let dropped = false;
+  S.srfs = S.srfs.filter(x => { if (x.apptId === a.id) return false;
+    if (!dropped && !x.apptId && x.date === a.date && x.srf === a.srf && x.kind === "Appointment") { dropped = true; return false; } return true; });
+  S.appts = S.appts.filter(x => x.id !== a.id);
+  S.undo = S.undo.filter(u => !(u.k === "appt" && u.id === a.id)); }
+function applyUndo(u){ if (!u) return;
+  if (u.k === "si" || u.k === "initiated") { const w = wByKey(u.wk); w[u.k] = Math.max(0, (+w[u.k] || 0) - 1); }
+  else if (u.k === "volume") { const w = wByKey(u.wk); w.volume = Math.max(0, (+w.volume || 0) - (u.amt || 0)); }
+  else if (u.k === "booked") { S.bookedAhead = Math.max(0, (+S.bookedAhead || 0) - 1); }
+  else if (u.k === "srf") { S.srfs = S.srfs.filter(x => x.id !== u.id); }
+  else if (u.k === "appt") { const a = S.appts.find(x => x.id === u.id); if (a) reverseAppt(a); } }
 
 /* ============ DATE HELPERS ============ */
 const p2 = n => String(n).padStart(2,"0");
@@ -527,6 +561,9 @@ function renderHome(){ const mode = curMode(), day = dy(), w = wk();
   $("monthLine").textContent = "Month: Cards "+(m.cards ?? 0)+"/4 · Loans "+(m.loans ?? 0)+"/3 · Risk "+(m.risk ?? 0)+"/2 · Closed "+(m.closed ?? 0)+"/10";
   const L = focusList(); const low = L.reduce((a,b) => b.ratio < a.ratio ? b : a, L[0]);
   $("tomorrowLine").textContent = low.ratio >= 1 ? "Tomorrow's focus: keep the pace — protect the renewals." : "Tomorrow's focus: "+low.title.toLowerCase()+".";
+  const lastU = S.undo && S.undo.length ? S.undo[S.undo.length - 1] : null;
+  $("undoNote").textContent = lastU ? "Last tap: " + describeUndo(lastU) + " — Undo takes it back." : "Nothing to undo right now.";
+  $("undoBtn").style.opacity = lastU ? "1" : ".45";
   renderSrfToday();
 }
 function setCircle(id, done){ const c = $(id); c.classList.toggle("done", !!done); c.textContent = done ? "✓" : ""; }
@@ -577,9 +614,16 @@ function renderLog(){ const w = wk(), m = mo();
     if (v.risk != null) parts.push("Risk <b>"+v.risk+"</b>");
     if (v.closed != null) parts.push("Closed <b>"+v.closed+"</b>");
     return "<b>"+esc(k)+"</b> — " + (parts.length ? parts.join(" · ") : "nothing logged"); }).join("<br>");
-  const sl = S.srfs.slice(-10).reverse().map(x => esc(x.date)+" · SRF <b>"+esc(x.srf)+"</b> · "+esc(x.kind)).join("<br>");
-  const al = (S.appts || []).slice(-8).reverse().map(a => esc(a.date)+" · SRF <b>"+esc(a.srf)+"</b> — "+a.products.map(prodLabel).map(esc).join(", ")+(a.volume ? " · <b>"+fmtK(a.volume)+"</b>" : "")).join("<br>");
-  $("history").innerHTML = wl + (ml ? "<br><br>"+ml : "") + (al ? "<br><br>Appointments &amp; their products:<br>"+al : "") + (sl ? "<br><br>Recent SRFs:<br>"+sl : ""); }
+  const delBtn = (attr, id) => ' <button class="ghostbtn" ' + attr + '="' + esc(id) + '" style="padding:2px 10px; font-size:12px; margin-left:6px">Delete</button>';
+  const sl = S.srfs.slice(-10).reverse().map(x => '<div style="padding:3px 0">' + esc(x.date) + ' · SRF <b>' + esc(x.srf) + '</b> · ' + esc(x.kind) + delBtn("data-srfdel", x.id) + '</div>').join("");
+  const al = (S.appts || []).slice(-8).reverse().map(a => '<div style="padding:3px 0">' + esc(a.date) + ' · SRF <b>' + esc(a.srf) + '</b> — ' + a.products.map(prodLabel).map(esc).join(", ") + (a.volume ? ' · <b>' + fmtK(a.volume) + '</b>' : '') + delBtn("data-apptdel", a.id) + '</div>').join("");
+  $("history").innerHTML = wl + (ml ? "<br><br>" + ml : "") + (al ? "<br><br>Appointments &amp; their products — Delete takes the counts off too:<br>" + al : "") + (sl ? "<br><br>Recent SRFs — Delete removes the record only:<br>" + sl : "");
+  document.querySelectorAll("[data-srfdel]").forEach(b => b.onclick = () => { if (!confirm("Delete this SRF record? Counts do not change — this is just the paper trail.")) return;
+    S.srfs = S.srfs.filter(x => x.id !== b.dataset.srfdel);
+    S.undo = S.undo.filter(u => !(u.k === "srf" && u.id === b.dataset.srfdel)); save(); renderLog(); renderHome(); });
+  document.querySelectorAll("[data-apptdel]").forEach(b => b.onclick = () => { const a = S.appts.find(x => x.id === b.dataset.apptdel); if (!a) return;
+    if (!confirm("Delete this appointment? Held, its products and its volume come off your week and month automatically.")) return;
+    reverseAppt(a); save(); renderLog(); renderHome(); }); }
 
 /* ============ RENDER: RULES ============ */
 function renderRules(){ const q = ($("ruleSearch").value || "").toLowerCase();
@@ -624,7 +668,7 @@ $("apptSave").onclick = () => { const srf = $("apptSrf").value.trim();
   if (!srf) { alert("Add the client SRF first — the products attach to it."); return; }
   if (!apptSel.size) { alert("Tap at least one product done in this appointment."); return; }
   const vol = numOrNull($("apptVolume").value) || 0;
-  const rec = { date: dstr(new Date()), srf: srf, products: Array.from(apptSel), volume: vol };
+  const rec = { id: uid(), date: dstr(new Date()), wk: dstr(mondayOf(new Date())), mk: monthKeyOf(new Date()), srf: srf, products: Array.from(apptSel), volume: vol };
   S.appts.push(rec);
   const w = wk(), m = mo(); w.held = (+w.held||0)+1;
   const counts = { si:0, myadvisor:0, initiated:0, cards:0, loans:0, risk:0 };
@@ -632,26 +676,29 @@ $("apptSave").onclick = () => { const srf = $("apptSrf").value.trim();
   w.si = (+w.si||0)+counts.si; w.myadvisor = (+w.myadvisor||0)+counts.myadvisor; w.initiated = (+w.initiated||0)+counts.initiated;
   m.cards = (+m.cards||0)+counts.cards; m.loans = (+m.loans||0)+counts.loans; m.risk = (+m.risk||0)+counts.risk;
   if (vol) w.volume = (+w.volume||0)+vol;
-  if (!S.srfs.some(x => x.date === rec.date && x.srf === srf)) S.srfs.push({ date: rec.date, srf: srf, kind: "Appointment" });
+  if (!S.srfs.some(x => x.date === rec.date && x.srf === srf)) S.srfs.push({ id: uid(), date: rec.date, srf: srf, kind: "Appointment", apptId: rec.id });
+  pushUndo({ k:"appt", id: rec.id, srf: srf, n: rec.products.length });
   const bits = ["Held +1"]; if (counts.si) bits.push("S&I +"+counts.si); if (counts.myadvisor) bits.push("MyAdvisor +1");
   if (counts.initiated) bits.push("Initiated +"+counts.initiated); if (counts.cards) bits.push("Cards +1");
   if (counts.loans) bits.push("Loans +1"); if (counts.risk) bits.push("Risk +1"); if (vol) bits.push("Volume +"+fmtK(vol));
   apptSel.clear(); $("apptSrf").value = ""; $("apptVolume").value = ""; renderApptProducts();
   $("apptForm").classList.add("hidden"); save(); renderHome(); renderLog();
   alert("Appointment saved for SRF "+srf+" — "+bits.join(" · ")); };
-document.querySelectorAll("[data-q]").forEach(b => b.onclick = () => { const w = wk(); const q = b.dataset.q;
+document.querySelectorAll("[data-q]").forEach(b => b.onclick = () => { const w = wk(); const q = b.dataset.q; const wkK = dstr(mondayOf(new Date()));
   if (q === "appt") { $("apptForm").classList.toggle("hidden"); renderApptProducts(); return; }
-  if (q === "si") w.si = (+w.si||0)+1;
-  if (q === "initiated") w.initiated = (+w.initiated||0)+1;
-  if (q === "booked") S.bookedAhead = (+S.bookedAhead||0)+1;
-  if (q === "volume") { const v = prompt("Volume $ to add for this week:", "10000"); const n = numOrNull(v == null ? "" : v); if (n) w.volume = (+w.volume||0)+n; }
+  if (q === "si") { w.si = (+w.si||0)+1; pushUndo({ k:"si", wk:wkK }); }
+  if (q === "initiated") { w.initiated = (+w.initiated||0)+1; pushUndo({ k:"initiated", wk:wkK }); }
+  if (q === "booked") { S.bookedAhead = (+S.bookedAhead||0)+1; pushUndo({ k:"booked" }); }
+  if (q === "volume") { const v = prompt("Volume $ to add for this week:", "10000"); const n = numOrNull(v == null ? "" : v); if (n) { w.volume = (+w.volume||0)+n; pushUndo({ k:"volume", wk:wkK, amt:n }); } }
   if (q === "srf") { $("srfForm").classList.toggle("hidden"); renderSrfToday(); return; }
   save(); renderHome(); });
+$("undoBtn").onclick = () => { const u = S.undo && S.undo.pop(); if (!u) return; applyUndo(u); save(); renderHome(); renderLog(); };
 document.querySelectorAll("#srfKind button").forEach(b => b.onclick = () => {
   document.querySelectorAll("#srfKind button").forEach(x => x.classList.toggle("on", x === b)); });
 $("srfSave").onclick = () => { const v = $("srfInput").value.trim(); if (!v) { alert("Type the SRF number first."); return; }
   const kind = (document.querySelector("#srfKind button.on") || {}).dataset ? document.querySelector("#srfKind button.on").dataset.k : "Appointment";
-  S.srfs.push({ date: dstr(new Date()), srf: v, kind: kind }); $("srfInput").value = ""; save(); renderSrfToday(); renderHome(); };
+  const rec = { id: uid(), date: dstr(new Date()), srf: v, kind: kind }; S.srfs.push(rec);
+  pushUndo({ k:"srf", id: rec.id, srf: v }); $("srfInput").value = ""; save(); renderSrfToday(); renderHome(); };
 $("saveWeek").onclick = () => { const w = wk();
   w.held = numOrNull($("inHeld").value); w.touches = numOrNull($("inTouches").value); w.si = numOrNull($("inSi").value);
   w.initiated = numOrNull($("inInitiated").value); w.linked = numOrNull($("inLinked").value);
@@ -669,7 +716,7 @@ $("exportBtn").onclick = () => { const blob = new Blob([JSON.stringify(S, null, 
 $("importBtn").onclick = () => $("importFile").click();
 $("importFile").addEventListener("change", ev => { const file = ev.target.files[0]; if (!file) return;
   file.text().then(t => { try { const data = JSON.parse(t); if (!data.weeks || !data.months) throw new Error("bad file");
-    S = Object.assign(defState(), data); save(); renderHome(); renderTargets(); renderPlan(); renderLog(); renderRules(); alert("Backup imported."); }
+    S = Object.assign(defState(), data); normalize(); applyTheme(); applyFont(); save(); renderHome(); renderTargets(); renderPlan(); renderLog(); renderRules(); alert("Backup imported."); }
     catch(e){ alert("That file could not be imported."); } }); });
 
 /* ============ INIT ============ */
