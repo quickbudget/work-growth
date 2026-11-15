@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#102A54">
+<title>Work Growth — BIC Plan</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { background:#0B1D3D; color:#EAF1FB; font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  #app { max-width: 480px; margin: 0 auto; background:#102A54; min-height: 100vh; padding: 18px 16px 110px; }
+  h1 { font-size: 15px; letter-spacing: 2px; color:#8CB4EB; font-weight: 700; }
+  .dateline { display:flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+  .date { font-size: 17px; color:#BED2F0; }
+  .chip { background:#FFCD5A; color:#3C2D00; font-weight: 700; font-size: 13px; padding: 6px 12px; border-radius: 999px; border:0; cursor:pointer; }
+  .chip.alt { background:#183A6E; color:#AAC3EB; }
+  .focuscard { background:#fff; color:#102A54; border-radius: 22px; padding: 18px; margin-top: 14px; }
+  .focuscard .kicker { font-size: 12px; letter-spacing: 1.5px; color:#78828F; font-weight: 700; display:flex; justify-content: space-between; }
+  .focuscard .kicker button { background:none; border:0; color:#B07E10; font-weight:700; font-size:12px; cursor:pointer; }
+  .focuscard h2 { font-size: 32px; margin: 6px 0 2px; line-height: 1.1; }
+  .focuscard .stat { font-size: 17px; font-weight: 700; color:#324155; }
+  .bar { background:#E4E9F0; border-radius: 999px; height: 14px; margin: 10px 0; overflow: hidden; }
+  .bar > div { background:#FFB000; height: 100%; border-radius: 999px; }
+  .bar > div.green { background:#14A078; }
+  .focuscard .why { font-size: 15px; color:#5F6C7D; line-height: 1.35; }
+  .focuscard .act { font-size: 15px; font-weight: 700; margin-top: 4px; }
+  .forecast { font-size: 15px; color:#A03C28; line-height: 1.35; }
+  .sect { font-size: 13px; letter-spacing: 1.5px; color:#8CB4EB; font-weight: 700; margin: 20px 0 8px; }
+  .rowcard { background:#183A6E; border-radius: 16px; padding: 13px 14px; margin-bottom: 10px; }
+  .rowcard .t { font-size: 17px; font-weight: 700; }
+  .rowcard .s { font-size: 13px; color:#AAC3EB; margin-top: 2px; }
+  .lt { display:flex; justify-content: space-between; align-items: flex-start; }
+  .segs { display:flex; gap: 6px; padding-top: 2px; }
+  .seg { width: 30px; height: 26px; border-radius: 8px; border: 3px solid #96B4E1; background: transparent; cursor: pointer; padding: 0; }
+  .seg.on { background:#FFCD5A; border-color:#FFCD5A; }
+  .segcount { color:#FFCD5A; font-weight: 700; font-size: 13px; text-align: right; margin-top: 4px; }
+  .checkrow { display:flex; gap: 12px; align-items: center; cursor: pointer; }
+  .circle { width: 34px; height: 34px; border-radius: 50%; border: 4px solid #A0C3F5; flex: 0 0 auto; display:flex; align-items:center; justify-content:center; font-size: 18px; color:#fff; }
+  .circle.done { background:#14A078; border-color:#14A078; }
+  .quicklog { display:flex; gap: 8px; flex-wrap: wrap; }
+  .qbtn { background:#fff; color:#102A54; border:0; font-weight: 700; font-size: 15px; padding: 10px 14px; border-radius: 999px; cursor: pointer; }
+  .qbtn:active { background:#FFCD5A; }
+  .strip { display:grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .tile { background:#183A6E; border-radius: 14px; padding: 9px 10px; }
+  .tile .n { font-size: 12px; color:#AAC3EB; }
+  .tile .v { font-size: 16px; font-weight: 700; margin: 2px 0 6px; }
+  .tile .bar { background:#32548C; height: 8px; margin: 0; }
+  .bicdots { display:flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+  .bicdot { display:flex; align-items: center; gap: 6px; font-size: 14px; }
+  .dot { width: 18px; height: 18px; border-radius: 50%; background:#5F7396; }
+  .dot.g { background:#78DCAA; } .dot.r { background:#FF7878; } .dot.a { background:#FFCD5A; }
+  .monthline { font-size: 14px; color:#AAC3EB; margin-top: 10px; }
+  .tomorrow { font-size: 15px; color:#AAC3EB; margin-top: 14px; }
+  nav { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); width: min(448px, calc(100% - 20px)); background:#183A6E; border-radius: 18px; display:flex; padding: 8px; z-index: 10; box-shadow: 0 6px 24px rgba(0,0,0,.35); }
+  nav button { flex:1; background:none; border:0; color:#8CAAD2; font-size: 15px; font-weight: 600; padding: 10px 0; border-radius: 12px; cursor: pointer; }
+  nav button.on { color:#fff; background:#102A54; }
+  .card { background:#183A6E; border-radius: 16px; padding: 14px; margin-bottom: 12px; }
+  .card h3 { font-size: 18px; margin-bottom: 4px; }
+  .card .sub { font-size: 13px; color:#AAC3EB; line-height: 1.4; }
+  .segbtns { display:flex; background:#0B1D3D; border-radius: 999px; padding: 3px; margin: 10px 0; }
+  .segbtns button { flex:1; background:none; border:0; color:#AAC3EB; font-weight: 700; font-size: 14px; padding: 7px 0; border-radius: 999px; cursor: pointer; }
+  .segbtns button.on { background:#FFCD5A; color:#3C2D00; }
+  .vsrow { display:flex; justify-content: space-between; font-size: 14px; margin-top: 8px; }
+  .vsrow b { font-size: 16px; }
+  .card .bar { background:#32548C; }
+  details.card summary { font-size: 18px; font-weight: 700; cursor: pointer; list-style: none; }
+  details.card summary::-webkit-details-marker { display:none; }
+  details.card ul { margin: 10px 0 2px 18px; }
+  details.card li { font-size: 14px; color:#D7E4F7; line-height: 1.45; margin-bottom: 6px; }
+  label.f { display:block; font-size: 13px; color:#AAC3EB; margin: 10px 0 4px; }
+  input[type=number], input[type=text], input[type=search], input[type=date] { width: 100%; background:#0B1D3D; border: 1px solid #32548C; color:#fff; font-size: 16px; padding: 10px; border-radius: 10px; }
+  .grid2 { display:grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+  .bigbtn { background:#FFCD5A; color:#3C2D00; border:0; font-weight: 800; font-size: 16px; width: 100%; padding: 13px; border-radius: 12px; cursor: pointer; margin-top: 14px; }
+  .ghostbtn { background:none; color:#AAC3EB; border: 1px solid #32548C; font-weight: 700; font-size: 14px; padding: 10px 14px; border-radius: 10px; cursor: pointer; }
+  .hist { font-size: 14px; color:#D7E4F7; line-height: 1.5; }
+  .hist b { color:#fff; }
+  .note { font-size: 12px; color:#7E97BC; line-height: 1.4; margin-top: 8px; }
+  .hidden { display:none; }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- HOME -->
+  <section id="tab-home">
+    <h1 id="homeKicker">TODAY'S FOCUS</h1>
+    <div class="dateline"><span class="date" id="homeDate"></span><button class="chip" id="modeChip"></button></div>
+    <div class="focuscard" id="focusCard"></div>
+
+    <div id="dayBlock">
+      <div class="sect">DO IT IN PARTS — TAP AS YOU GO</div>
+      <div class="rowcard">
+        <div class="lt">
+          <div><div class="t">Light touches</div><div class="s">pick how you reached out, then tap a box per touch · tap a filled box to undo</div></div>
+          <div><div class="segs" id="ltSegs"></div><div class="segcount" id="ltCount"></div></div>
+        </div>
+        <div class="segbtns" id="ltChannel" style="margin:10px 0 0">
+          <button data-ch="phone" class="on">📞 Phone</button><button data-ch="email">✉️ Email</button>
+        </div>
+        <div class="s" id="ltBreak" style="font-size:13px; color:#AAC3EB; margin-top:6px"></div>
+      </div>
+      <div class="rowcard checkrow" id="partnerRow"><div class="circle" id="partnerCircle"></div><div><div class="t">Partner intro at 8:30 prep</div><div class="s">decide 1 name every morning</div></div></div>
+      <div class="rowcard checkrow" id="bookRow"><div class="circle" id="bookCircle"></div><div><div class="t">Book-before-they-leave</div><div class="s">every appointment ends with the next one booked</div></div></div>
+
+      <div class="sect">LOG IT IN 2 TAPS</div>
+      <div class="quicklog">
+        <button class="qbtn" data-q="held">+ Appt held</button>
+        <button class="qbtn" data-q="si">+ S&amp;I</button>
+        <button class="qbtn" data-q="initiated">+ Referral</button>
+        <button class="qbtn" data-q="volume">+ Volume</button>
+        <button class="qbtn" data-q="booked">+ Booked</button>
+        <button class="qbtn" data-q="srf">+ SRF</button>
+      </div>
+    </div>
+
+    <div id="wrapBlock" class="hidden">
+      <div class="sect">SAME-DAY RULES — MISSED TONIGHT = LOST</div>
+      <div id="wrapList"></div>
+      <div class="note">The day closes when all 4 are captured. Same-day entry is not admin — it is the credit itself.</div>
+    </div>
+
+    <div class="rowcard hidden" id="srfForm" style="margin-top:10px">
+      <div class="t" style="font-size:16px">Record a client SRF</div>
+      <div class="s">The SRF is the link — referrals and solutions are captured by it.</div>
+      <label class="f">Client SRF number</label>
+      <input type="text" id="srfInput" inputmode="numeric" placeholder="e.g. 123456789">
+      <label class="f">What is it for?</label>
+      <div class="segbtns" id="srfKind" style="margin:4px 0 0">
+        <button data-k="Appointment" class="on">Appointment</button><button data-k="Referral">Referral</button><button data-k="CASPER">CASPER</button>
+      </div>
+      <button class="bigbtn" id="srfSave">Save SRF</button>
+      <div class="note" id="srfToday"></div>
+    </div>
+
+    <div class="sect">THIS WEEK — ALL OF IT</div>
+    <div class="strip" id="weekStrip"></div>
+
+    <div class="sect">ROAD TO BIC — TRAILING PACE VS BIC NEEDED</div>
+    <div class="bicdots" id="bicDots"></div>
+    <div class="monthline" id="monthLine"></div>
+    <div class="tomorrow" id="tomorrowLine"></div>
+  </section>
+
+  <!-- TARGETS -->
+  <section id="tab-targets" class="hidden">
+    <h1>TARGETS</h1>
+    <div class="date" style="margin:4px 0 12px">Our target vs BIC needed</div>
+    <div class="segbtns" id="tfToggle">
+      <button data-tf="w">Week</button><button data-tf="m" class="on">Month</button><button data-tf="y">Year</button>
+    </div>
+    <div id="targetCards"></div>
+    <div class="note">Official BIC thresholds are trailing-12-month totals. Counting rule: everything manual — only manual CASPER applications count toward cards and loans; pre-approved counts as zero. S&amp;I counts NEW sales only; renewals count as volume.</div>
+  </section>
+
+  <!-- PLAN -->
+  <section id="tab-plan" class="hidden">
+    <h1>THE PLAN</h1>
+    <div class="date" style="margin:4px 0 12px">How each target gets done</div>
+    <div id="planList"></div>
+    <div class="card"><h3>The daily system</h3><div class="sub">8:30 prep per client (reason for visit · spotted opportunity · MyAdvisor use · partner to bring in · what's next) → appointments with a stack in each → wrap-up capture before you leave → Friday 10-minute log. Phases: Nov–Jan Stabilise · Feb–Apr Target pace · May–Oct our-target pace is the normal week.</div></div>
+  </section>
+
+  <!-- LOG -->
+  <section id="tab-log" class="hidden">
+    <h1>LOG</h1>
+    <div class="date" style="margin:4px 0 12px">Friday 10 minutes — the week &amp; the month</div>
+    <div class="card">
+      <h3 id="weekFormTitle">This week</h3>
+      <div class="grid2">
+        <div><label class="f">Appointments held</label><input type="number" id="inHeld" min="0"></div>
+        <div><label class="f">Booked for next week</label><input type="number" id="inBooked" min="0"></div>
+        <div><label class="f">Light touches</label><input type="number" id="inTouches" min="0"></div>
+        <div><label class="f">S&amp;I new solutions</label><input type="number" id="inSi" min="0"></div>
+        <div><label class="f">Initiated referrals</label><input type="number" id="inInitiated" min="0"></div>
+        <div><label class="f">Solutions linked to appts</label><input type="number" id="inLinked" min="0"></div>
+        <div><label class="f">MyAdvisor done (target 12/wk)</label><input type="number" id="inMyadvisor" min="0"></div>
+        <div><label class="f">Volume $ this week</label><input type="number" id="inVolume" min="0" step="1000"></div>
+      </div>
+      <button class="bigbtn" id="saveWeek">Save week</button>
+    </div>
+    <div class="card">
+      <h3 id="monthFormTitle">This month — credit counts (manual only)</h3>
+      <div class="grid2">
+        <div><label class="f">Credit cards (manual CASPER)</label><input type="number" id="inCards" min="0"></div>
+        <div><label class="f">Loans (manual CASPER)</label><input type="number" id="inLoans" min="0"></div>
+        <div><label class="f">Risk solutions</label><input type="number" id="inRisk" min="0"></div>
+        <div><label class="f">Closed referrals</label><input type="number" id="inClosed" min="0"></div>
+      </div>
+      <button class="bigbtn" id="saveMonth">Save month</button>
+      <div class="note">Pre-approved cards and loans are served to the client but logged as zero here — they do not count toward these benchmarks.</div>
+    </div>
+    <div class="card"><h3>History</h3><div class="hist" id="history"></div></div>
+    <div class="card">
+      <h3>Your data</h3>
+      <div class="sub">Everything is stored only on this phone, in this browser. Export a backup before switching phones or clearing browser data.</div>
+      <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap">
+        <button class="ghostbtn" id="exportBtn">Export backup</button>
+        <button class="ghostbtn" id="importBtn">Import backup</button>
+        <input type="file" id="importFile" accept="application/json" class="hidden">
+      </div>
+    </div>
+  </section>
+
+  <!-- RULES -->
+  <section id="tab-rules" class="hidden">
+    <h1>RULES</h1>
+    <div class="date" style="margin:4px 0 12px">The crediting cheat sheet</div>
+    <input type="search" id="ruleSearch" placeholder="Search rules — try C360, PAC, day 45…">
+    <div id="ruleList" style="margin-top:12px"></div>
+  </section>
+</div>
+
+<nav>
+  <button data-tab="home" class="on">Home</button>
+  <button data-tab="targets">Targets</button>
+  <button data-tab="plan">Plan</button>
+  <button data-tab="log">Log</button>
+  <button data-tab="rules">Rules</button>
+</nav>
+
+<script>
+"use strict";
+/* ============ DATA ============ */
+const TARGETS = [
+  { id:"appts", name:"Appointments held", drive:"week",
+    ours:{w:"30 floor · 35 mid · 40 real", m:"130", y:"1,560"}, oursNum:{w:30, m:130, y:1560},
+    bic:{w:">20", m:">87", y:">1,040"}, bicNum:{w:20, m:86.7, y:1040}, mult:"1.5x BIC at the floor",
+    note:"BIC is a weekly average >20. Our tiers were set 2026-11-14. Best week so far: 28 held." },
+  { id:"myadvisor", name:"MyAdvisor", drive:"week",
+    ours:{w:"12", m:"52", y:"624"}, oursNum:{w:12, m:52, y:624},
+    bic:{w:"—", m:"—", y:"—"}, bicNum:{w:0, m:0, y:0}, mult:"your target — set 2026-11-15",
+    note:"Your target: 12 MyAdvisor per week. For reference the branch bar is MyAdvisor in 80% of appointments — at 30 appointments that is ~24, so 12 is your floor, not the ceiling." },
+  { id:"si", name:"Saving & Investing solutions", drive:"week",
+    ours:{w:"6", m:"26", y:"312"}, oursNum:{w:6, m:26, y:312},
+    bic:{w:">3.69", m:">16", y:">192"}, bicNum:{w:3.69, m:16, y:192}, mult:"1.6x BIC",
+    note:"Kept at the HIGHEST tier. New PACs, PAC increases, funded new savings (day-45 $100+), assisted opens incl. NOMI Find & Save, new GICs. Renewals do NOT count here." },
+  { id:"cards", name:"Credit Card — manual CASPER only", drive:"month",
+    ours:{w:"0.92", m:"4", y:"48"}, oursNum:{w:0.92, m:4, y:48},
+    bic:{w:">0.38", m:">1.67", y:">20"}, bicNum:{w:0.38, m:1.67, y:20}, mult:"2.4x BIC",
+    note:"MANUAL CASPER applications only. Pre-approved cards count as ZERO toward this benchmark." },
+  { id:"loans", name:"Loans — manual CASPER only", drive:"month",
+    ours:{w:"0.69", m:"3", y:"36"}, oursNum:{w:0.69, m:3, y:36},
+    bic:{w:">0.35", m:">1.5", y:">18"}, bicNum:{w:0.35, m:1.5, y:18}, mult:"2.0x BIC",
+    note:"Manual CASPER only — everything is manual." },
+  { id:"risk", name:"Risk solutions (insurance) — at least", drive:"month",
+    ours:{w:"0.46", m:"2", y:"24"}, oursNum:{w:0.46, m:2, y:24},
+    bic:{w:">0.23", m:">1", y:">12"}, bicNum:{w:0.23, m:1, y:12}, mult:"2.0x BIC",
+    note:"A FLOOR, not a cap. 1/month = exactly 12/yr, which is NOT >12 — 2/month is the safe BIC pace." },
+  { id:"closed", name:"Closed Referrals (IRP & MS) — at least", drive:"month",
+    ours:{w:"2.31", m:"10", y:"120"}, oursNum:{w:2.31, m:10, y:120},
+    bic:{w:">0.48", m:">2.08", y:">25"}, bicNum:{w:0.48, m:2.08, y:25}, mult:"4.8x BIC",
+    note:"A FLOOR, not a cap. Above the branch card's 2 closed/week and CEAB Partnering Level 5 (6.52/month). Closings lag initiations by months — pipeline-driven." },
+  { id:"volume", name:"Total volume", drive:"week",
+    ours:{w:"$769,231", m:"$3,333,333", y:"$40,000,000"}, oursNum:{w:769231, m:3333333, y:40000000},
+    bic:{w:"—", m:"—", y:"—"}, bicNum:{w:0, m:0, y:0}, mult:"personal target",
+    note:"No official BIC line. Branch new-money bar inside it: $175K/week. Renewals, PAC volume (365 days) and referral volume (180-day windows) feed this." },
+];
+const PLAN = [
+  { t:"Appointments — 30 / 35 / 40 per week", steps:[
+    "Light touches rebuild the book: Contacts = Light Touches + Appointments, and the book collapsed when light touches ran 1 then 0.",
+    "Book-before-they-leave: every appointment ends with the next one booked.",
+    "Protect renewal appointments first — they carry the highest dollars.",
+    "Fill weak days from the leads list, worked end-to-end daily — not by hoping.",
+    "Measure Friday: held this week + booked for each of the next 3 weeks. A future week under 30 booked is next week's #1 job." ] },
+  { t:"MyAdvisor — 12 per week", steps:[
+    "Start every appointment in MyAdvisor discovery — it is where cards, loans, risk and referrals are found.",
+    "Your floor is 12 a week. The branch bar is 80% of appointments, so every one above 12 is ground gained toward it.",
+    "Finish what you start: your recorded strength is completing plans once started (26 of 26 in the Oct–Nov weeks) — the gap is starting, not finishing." ] },
+  { t:"Saving & Investing — 6 per week", steps:[
+    "Stack 2–3 per face-to-face appointment: funded savings + NOMI Find & Save + new PAC from one conversation.",
+    "PAC increase offered at EVERY renewal / review — an increase credits the most recent increaser plus 365 days of increased volume.",
+    "Assisted opens: indicate the same day; the client opens digitally within 5 days.",
+    "At a renewal, the NEW action beside it (new GIC, PAC increase, funded savings) is the S&I solution — the renewal itself is volume.",
+    "Weekly sweep: savings accounts nearing day 45 — confirm $100+ is still in.",
+    "Traps: savings drained before day 45 = no solution · PAC restarted before 190 days dead = no credit · GPAC excluded." ] },
+  { t:"Credit Card — 4 per month, manual only", steps:[
+    "The card question in every discovery — Card Selector as a reflex, not an occasion.",
+    "Both sides of the balance sheet in MyAdvisor: wherever debt or spending shows, a card conversation exists.",
+    "Start the CASPER application within ±5 days of the appointment so it also links as a solution to that appointment.",
+    "Spread ~1 per week across the month — never 4 in the last week.",
+    "Pre-approved cards: serve the client, log zero here." ] },
+  { t:"Loans — 3 per month, manual only", steps:[
+    "Debt needs surface in discovery: consolidation, car, renovation, big purchases — ask in every MyAdvisor conversation.",
+    "Pair every loan with protection (feeds Risk) and a PAC/savings plan for the payment (feeds S&I).",
+    "CASPER application within ±5 days of the appointment for linkage.",
+    "A loan that starts as a referral to MS is a REFERRAL, not a loan — one entry per role, from the start." ] },
+  { t:"Risk — at least 2 per month", steps:[
+    "One protection prompt per appointment, decided at the 8:30 pre-dive: which client, what gap.",
+    "Use the 'What If' Protection Tool in advice conversations — protection is part of the plan, not an add-on.",
+    "Attach the protection conversation to every new loan, card and mortgage-adjacent client.",
+    "Review coverage gaps at renewal appointments. Insurance utilisation products also lift solutions/appointment." ] },
+  { t:"Closed Referrals — at least 10 per month", steps:[
+    "Closed is a PIPELINE result: the initiated pipeline decides this number months ahead. Initiated referrals are the lever (branch bar 5/week until you set your own).",
+    "Referral entered in C360 THE DAY of the appointment — same-day entry still captures even a same-day partner sale.",
+    "One separate C360 entry PER ROLE (MS, FP/IRP, FP) — changing a category later moves nothing.",
+    "Enter EARLY: the earliest referral inside the 90-day window wins attribution.",
+    "Transfer-ins: the PLANNER's side initiates the CART, or the referral credit is lost.",
+    "Weekly partner follow-up on the open pipeline. Judge initiated weekly; judge closed on a 3-month view.",
+    "Traps: SRF mismatch = silently not captured · Sales Platform entries no longer count (C360 only) · mortgage renewals/refinances never count as MS referrals." ] },
+  { t:"Total volume — $769K per week", steps:[
+    "Renewals are the rocket ($492K + $266K closed in the last two recorded weeks) — protect and prepare them best.",
+    "Referral volume: one MS/FP referral captures the first sale + all volume within 180 days.",
+    "PAC volume: a new PAC pays on the first contribution; an increase pays the increased amount for up to 365 days.",
+    "Track new money ($175K/week branch bar) separately inside the total, so volume is not all renewals.",
+    "One $500K renewal week is not a pace — judge volume on the month." ] },
+];
+const RULES = [
+  { t:"Manual only (your rule)", s:"Only manual CASPER applications count toward your card and loan benchmarks. Pre-approved counts as zero — serve the client, log zero." },
+  { t:"Solution ↔ appointment link", s:"A solution links to an appointment only if the client's SRF is in the appointment's Related To field. Branch/offsite only — phone appointments are excluded." },
+  { t:"±5-day CASPER window", s:"Cards and loans count toward appointment linkage if the CASPER application starts within ±5 days of the appointment." },
+  { t:"Referrals: same-day C360 entry", s:"A closed referral must enter the C360 pipeline the same day as the appointment to capture cleanly. Same-day entry still counts even if the partner sells that day." },
+  { t:"C360 only — not Sales Platform", s:"Since April 2025 referrals must live in C360. Sales Platform entries no longer count." },
+  { t:"One entry per role", s:"MS, FP and IRP each need their own C360 referral from the start. Changing a category later moves nothing." },
+  { t:"Earliest in 90 days wins", s:"Attribution goes to the earliest referral inside the 90-day window — enter early. A deleted referral still pays its creator." },
+  { t:"SRF must match", s:"If the SRF on the C360 referral does not match the CASPER application, the referral is silently not captured. Check the number." },
+  { t:"Assisted sale: indicate same day", s:"Recommend → indicate the SAME day (Sales Platform wrap, AC call wrap, Client Connect, or C360 with the right product family) → client opens digitally within 5 calendar days. Closest indication wins; one indication can yield multiple solutions." },
+  { t:"NOMI Find & Save counts", s:"NOMI Find & Save is an assisted sale and counts toward Saving & Investing — when it runs through the indicate → open-in-5-days machine." },
+  { t:"Savings: $100 at day 45", s:"A new savings account counts only if $100+ is still held at day 45. Sweep accounts approaching day 45." },
+  { t:"New PAC definition", s:"A PAC counts as new only if none existed before, or the old one has been dead 190+ days. A restart before 190 days earns nothing." },
+  { t:"PAC increase credit", s:"An increase credits the most recent increaser, with volume on the increased amount for up to 365 days — until a decrease kills it." },
+  { t:"Renewals are volume, not S&I", s:"Renewals (incl. GIC and mortgage renewals) never count as Saving & Investing solutions or MS referrals. The new action taken beside a renewal is what counts." },
+  { t:"Direct Investing caps", s:"Assisted DI sales cap at 6 solutions per client per day; same-category accounts opened the same day count as one." },
+  { t:"ADCR deposit cap", s:"Deposit solutions are capped at 4 per client per year." },
+  { t:"FP/IRP transfer-in CART", s:"On transfer-in business the planner's side must initiate the Transfer-in CART — if the referring advisor submits it, the referral is not attributed." },
+  { t:"Referral volume window", s:"One referral captures the first sale plus all client volume within 180 days. PAC contribution volume runs up to 365 days." },
+];
+const WRAP_ITEMS = [
+  { id:"srf", t:"Link SRF on today's appointments", s:"Related To — done at wrap-up" },
+  { id:"c360", t:"Enter today's referrals in C360", s:"same-day entry still counts" },
+  { id:"indicate", t:"Indicate today's assisted opens", s:"NOMI + PAC — the 5-day clock starts now" },
+  { id:"day45", t:"Day-45 check on open savings", s:"confirm $100+ is still in" },
+];
+</script>
+
+<script>
+"use strict";
+/* ============ STATE ============ */
+const KEY = "workgrowth_v1";
+function defState(){ return { weeks:{}, months:{}, days:{}, srfs:[], bookedAhead:4,
+  focusOverride:null, modeOverride:null, ltChannel:"phone", tf:"m" }; }
+function load(){ try { const raw = localStorage.getItem(KEY); if (raw) return Object.assign(defState(), JSON.parse(raw)); } catch(e){}
+  const s = defState();
+  s.weeks["2026-11-02"] = { held:28, booked:null, touches:null, si:null, initiated:null, linked:null, myadvisor:null, volume:281000, seeded:true };
+  s.months["2026-11"] = { cards:null, loans:null, risk:null, closed:1, seeded:true };
+  return s; }
+let S = load();
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+
+/* ============ DATE HELPERS ============ */
+const p2 = n => String(n).padStart(2,"0");
+function dstr(d){ return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate()); }
+function mondayOf(d){ const x = new Date(d); x.setDate(x.getDate() - ((x.getDay()+6)%7)); x.setHours(0,0,0,0); return x; }
+function monthKeyOf(d){ return dstr(d).slice(0,7); }
+function fmtK(v){ v = +v||0; return v >= 1000 ? "$"+Math.round(v/1000)+"K" : "$"+v; }
+function esc(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+
+function wk(){ const k = dstr(mondayOf(new Date()));
+  if (!S.weeks[k]) S.weeks[k] = { held:0, booked:0, touches:0, si:0, initiated:0, linked:0, myadvisor:0, volume:0 };
+  return S.weeks[k]; }
+function mo(){ const k = monthKeyOf(new Date());
+  if (!S.months[k]) S.months[k] = { cards:0, loans:0, risk:0, closed:0 };
+  return S.months[k]; }
+function dy(){ const k = dstr(new Date());
+  if (!S.days[k]) S.days[k] = { touches:[], partner:false, book:false, wrap:{ srf:false, c360:false, indicate:false, day45:false } };
+  return S.days[k]; }
+function todaySrfs(){ const t = dstr(new Date()); return S.srfs.filter(x => x.date === t); }
+
+/* ============ FOCUS ENGINE ============ */
+function remainingWeekdays(){ const idx = (new Date().getDay()+6)%7; return idx <= 4 ? 5-idx : 5; }
+function focusList(){ const w = wk(), bk = +S.bookedAhead||0, rem = remainingWeekdays();
+  const fc = Math.min(30, bk + rem*3);
+  return [
+    { id:"book", ratio: bk/21, title:"Fill next week",
+      stat: bk+" booked · "+Math.max(0,21-bk)+" to go (target 21+)", bar: bk/21,
+      forecast: bk < 21 ? "Forecast: at this pace Friday ends ~"+fc+" booked — "+(fc >= 21 ? "that clears the floor." : "still short of the floor.") : "",
+      why:"Why: the book went thin when light touches hit 0 for two weeks.",
+      act:"5 touches a day closes the gap." },
+    { id:"si", ratio:(+w.si||0)/6, title:"Stack S&I in every appointment",
+      stat:(+w.si||0)+" of 6 S&I this week", bar:(+w.si||0)/6, forecast:"",
+      why:"Why: S&I is your strongest area — stacking keeps it at the highest tier you set.",
+      act:"Savings + NOMI + PAC in one conversation." },
+    { id:"myadvisor", ratio:(+w.myadvisor||0)/12, title:"Run MyAdvisor today",
+      stat:(+w.myadvisor||0)+" of 12 MyAdvisor this week", bar:(+w.myadvisor||0)/12, forecast:"",
+      why:"Why: MyAdvisor is where cards, loans, risk and referrals are found.",
+      act:"Start every appointment in MyAdvisor discovery." },
+    { id:"initiated", ratio:(+w.initiated||0)/5, title:"Feed the referral pipeline",
+      stat:(+w.initiated||0)+" of 5 initiated this week", bar:(+w.initiated||0)/5, forecast:"",
+      why:"Why: closed referrals are decided months ahead by what you initiate now.",
+      act:"1 partner intro a day, entered in C360 the same day." },
+    { id:"volume", ratio:(+w.volume||0)/769231, title:"Protect the renewal dollars",
+      stat:fmtK(w.volume)+" of $769K this week", bar:(+w.volume||0)/769231, forecast:"",
+      why:"Why: renewals are the rocket — your two biggest weeks were renewal weeks.",
+      act:"Prep renewals first; log every dollar the day it lands." } ]; }
+function curFocus(){ const L = focusList();
+  if (S.focusOverride) { const f = L.find(x => x.id === S.focusOverride); if (f) return f; }
+  return L.reduce((a,b) => b.ratio < a.ratio ? b : a, L[0]); }
+function curMode(){ if (S.modeOverride) return S.modeOverride;
+  const h = new Date().getHours(); if (h < 10) return "prep"; if (h >= 16) return "wrap"; return "focus"; }
+
+/* ============ RENDER: HOME ============ */
+const $ = id => document.getElementById(id);
+function renderHome(){ const mode = curMode(), day = dy(), w = wk();
+  $("homeDate").textContent = new Date().toLocaleDateString("en-CA", { weekday:"long", month:"short", day:"numeric" });
+  $("homeKicker").textContent = mode === "wrap" ? "BEFORE YOU LEAVE" : "TODAY'S FOCUS";
+  $("modeChip").textContent = mode === "prep" ? "8:30 PREP" : mode === "wrap" ? "WRAP-UP" : "FOCUS";
+  const fc = $("focusCard");
+  if (mode === "wrap") { const done = WRAP_ITEMS.filter(i => day.wrap[i.id]).length;
+    fc.innerHTML = '<div class="kicker"><span>CAPTURE TODAY</span></div><h2>Credit is won tonight</h2>'
+      + '<div class="stat">'+done+' of 4 done</div><div class="bar"><div class="green" style="width:'+(done/4*100)+'%"></div></div>'
+      + '<div class="why">Same-day entry is not admin — it is the credit itself.</div>';
+  } else { const f = curFocus();
+    fc.innerHTML = '<div class="kicker"><span>ONE JOB THIS WEEK</span><button id="swapFocus">Swap focus</button></div>'
+      + '<h2>'+esc(f.title)+'</h2><div class="stat">'+esc(f.stat)+'</div>'
+      + '<div class="bar"><div style="width:'+Math.min(100, Math.max(0, f.bar*100))+'%"></div></div>'
+      + (f.forecast ? '<div class="forecast">'+esc(f.forecast)+'</div>' : '')
+      + '<div class="why">'+esc(f.why)+'</div><div class="act">'+esc(f.act)+'</div>';
+    $("swapFocus").onclick = () => { const L = focusList(); const i = L.findIndex(x => x.id === f.id);
+      S.focusOverride = L[(i+1) % L.length].id; save(); renderHome(); };
+  }
+  $("dayBlock").classList.toggle("hidden", mode === "wrap");
+  $("wrapBlock").classList.toggle("hidden", mode !== "wrap");
+  // light touches
+  const n = day.touches.length, boxes = Math.min(10, Math.max(5, n));
+  $("ltSegs").innerHTML = Array.from({length: boxes}, (_,i) => '<button class="seg'+(i < n ? " on" : "")+'" data-seg="'+i+'" aria-label="touch '+(i+1)+'"></button>').join("");
+  document.querySelectorAll("#ltSegs .seg").forEach(b => b.onclick = () => { const i = +b.dataset.seg;
+    if (i < day.touches.length) day.touches.length = i; else while (day.touches.length <= i) day.touches.push(S.ltChannel);
+    syncDayTouches(); save(); renderHome(); });
+  $("ltCount").textContent = n+" of 5"+(n > 5 ? " · past today's 5" : "");
+  const e = day.touches.filter(x => x === "email").length, ph = day.touches.filter(x => x === "phone").length;
+  $("ltBreak").textContent = n ? ("Today: Phone "+ph+" · Email "+e) : "No touches yet today.";
+  document.querySelectorAll("#ltChannel button").forEach(b => { b.classList.toggle("on", b.dataset.ch === S.ltChannel);
+    b.onclick = () => { S.ltChannel = b.dataset.ch; save(); renderHome(); }; });
+  // parts circles
+  setCircle("partnerCircle", day.partner); setCircle("bookCircle", day.book);
+  $("partnerRow").onclick = () => { day.partner = !day.partner; save(); renderHome(); };
+  $("bookRow").onclick = () => { day.book = !day.book; save(); renderHome(); };
+  // wrap list
+  const ts = todaySrfs().length;
+  $("wrapList").innerHTML = WRAP_ITEMS.map(i => '<div class="rowcard checkrow" data-wrap="'+i.id+'"><div class="circle'+(day.wrap[i.id] ? " done" : "")+'">'+(day.wrap[i.id] ? "✓" : "")+'</div><div><div class="t" style="font-size:16px">'+esc(i.t)+'</div><div class="s">'+esc(i.s)+(i.id === "srf" ? " · "+ts+" SRF"+(ts === 1 ? "" : "s")+" recorded today" : "")+'</div>'+(i.id === "srf" ? '<button class="qbtn" id="wrapAddSrf" style="padding:5px 12px; font-size:13px; margin-top:6px">+ Add SRF</button>' : "")+'</div></div>').join("");
+  document.querySelectorAll("[data-wrap]").forEach(r => r.onclick = () => { const id = r.dataset.wrap; day.wrap[id] = !day.wrap[id]; save(); renderHome(); });
+  const was = $("wrapAddSrf"); if (was) was.onclick = ev => { ev.stopPropagation(); $("srfForm").classList.remove("hidden"); renderSrfToday(); $("srfForm").scrollIntoView({ behavior:"smooth" }); };
+  // week strip
+  const tiles = [ ["Held", (+w.held||0)+" / 30", (+w.held||0)/30], ["S&I", (+w.si||0)+" / 6", (+w.si||0)/6],
+    ["MyAdvisor", (+w.myadvisor||0)+" / 12", (+w.myadvisor||0)/12], ["Volume", fmtK(w.volume), (+w.volume||0)/769231],
+    ["Referrals", (+w.initiated||0)+" / 5", (+w.initiated||0)/5] ];
+  $("weekStrip").innerHTML = tiles.map(t => '<div class="tile"><div class="n">'+t[0]+'</div><div class="v">'+t[1]+'</div><div class="bar"><div class="'+(t[2] >= 0.6 ? "green" : "")+'" style="width:'+Math.min(100, Math.max(0, t[2]*100))+'%; background:'+(t[2] >= 0.6 ? "#78DCAA" : "#FF7878")+'"></div></div></div>').join("");
+  // road to BIC (completed weeks/months only)
+  const dots = [ ["Appts", avgField(S.weeks, "held", true), 20], ["S&I", avgField(S.weeks, "si", true), 3.69],
+    ["Cards", avgField(S.months, "cards", false), 1.67], ["Loans", avgField(S.months, "loans", false), 1.5],
+    ["Risk", avgField(S.months, "risk", false), 1], ["Refs", avgField(S.months, "closed", false), 2.08] ];
+  $("bicDots").innerHTML = dots.map(d => '<span class="bicdot"><span class="dot '+(d[1] == null ? "" : d[1] >= d[2] ? "g" : d[1] >= d[2]*0.8 ? "a" : "r")+'"></span>'+d[0]+'</span>').join("");
+  const m = mo();
+  $("monthLine").textContent = "Month: Cards "+(m.cards ?? 0)+"/4 · Loans "+(m.loans ?? 0)+"/3 · Risk "+(m.risk ?? 0)+"/2 · Closed "+(m.closed ?? 0)+"/10";
+  const L = focusList(); const low = L.reduce((a,b) => b.ratio < a.ratio ? b : a, L[0]);
+  $("tomorrowLine").textContent = low.ratio >= 1 ? "Tomorrow's focus: keep the pace — protect the renewals." : "Tomorrow's focus: "+low.title.toLowerCase()+".";
+  renderSrfToday();
+}
+function setCircle(id, done){ const c = $(id); c.classList.toggle("done", !!done); c.textContent = done ? "✓" : ""; }
+function syncDayTouches(){ const day = dy(); const k = dstr(mondayOf(new Date()));
+  if (S.weeks[k]) { const prev = Object.entries(S.days).filter(([dk]) => dstr(mondayOf(new Date(dk+"T12:00:00"))) === k && dk !== dstr(new Date())).reduce((a,[,dv]) => a + (dv.touches ? dv.touches.length : 0), 0);
+    S.weeks[k].touches = prev + day.touches.length; } }
+function avgField(obj, field, isWeek){ const curK = isWeek ? dstr(mondayOf(new Date())) : monthKeyOf(new Date());
+  const es = Object.entries(obj).filter(([k,v]) => k !== curK && v[field] != null);
+  if (!es.length) return null; return es.reduce((a,[,v]) => a + (+v[field]||0), 0) / es.length; }
+function renderSrfToday(){ const el = $("srfToday"); if (!el) return; const list = todaySrfs();
+  el.textContent = list.length ? "Today: " + list.map(x => x.srf+" ("+x.kind+")").join(" · ") : "No SRFs recorded today yet."; }
+
+/* ============ RENDER: TARGETS ============ */
+function renderTargets(){ const tf = S.tf;
+  document.querySelectorAll("#tfToggle button").forEach(b => b.classList.toggle("on", b.dataset.tf === tf));
+  $("targetCards").innerHTML = TARGETS.map(t => { const ours = t.oursNum[tf], bic = t.bicNum[tf];
+    const scale = Math.max(ours, bic) || 1;
+    return '<div class="card"><h3>'+esc(t.name)+'</h3><div class="sub">'+esc(t.mult)+'</div>'
+      + '<div class="vsrow"><span>OUR TARGET</span><b>'+esc(t.ours[tf])+'</b></div><div class="bar"><div style="width:'+(ours/scale*100)+'%; background:#FFCD5A"></div></div>'
+      + '<div class="vsrow"><span>BIC NEEDED</span><b>'+esc(t.bic[tf])+'</b></div><div class="bar"><div style="width:'+(bic/scale*100)+'%; background:#8CB4EB"></div></div>'
+      + '<div class="sub" style="margin-top:8px">'+esc(t.note)+'</div></div>'; }).join(""); }
+
+/* ============ RENDER: PLAN ============ */
+function renderPlan(){ $("planList").innerHTML = PLAN.map((p,i) => '<details class="card"'+(i === 0 ? " open" : "")+'><summary>'+esc(p.t)+'</summary><ul>'+p.steps.map(s => '<li>'+esc(s)+'</li>').join("")+'</ul></details>').join(""); }
+
+/* ============ RENDER: LOG ============ */
+function numOrNull(v){ const t = String(v).trim(); if (t === "") return null; const n = +t; return isNaN(n) ? null : n; }
+function renderLog(){ const w = wk(), m = mo();
+  $("weekFormTitle").textContent = "Week of " + mondayOf(new Date()).toLocaleDateString("en-CA", { month:"short", day:"numeric" });
+  const set = (id, v) => { $(id).value = v == null ? "" : v; };
+  set("inHeld", w.held); set("inBooked", S.bookedAhead); set("inTouches", w.touches); set("inSi", w.si);
+  set("inInitiated", w.initiated); set("inLinked", w.linked); set("inMyadvisor", w.myadvisor); set("inVolume", w.volume);
+  $("monthFormTitle").textContent = new Date().toLocaleDateString("en-CA", { month:"long" }) + " — credit counts (manual only)";
+  set("inCards", m.cards); set("inLoans", m.loans); set("inRisk", m.risk); set("inClosed", m.closed);
+  const wl = Object.entries(S.weeks).sort((a,b) => b[0].localeCompare(a[0])).map(([k,v]) => {
+    const parts = [];
+    if (v.held != null) parts.push("Held <b>"+v.held+"</b>");
+    if (v.si != null) parts.push("S&I <b>"+v.si+"</b>");
+    if (v.myadvisor != null) parts.push("MyAdvisor <b>"+v.myadvisor+"</b>");
+    if (v.initiated != null) parts.push("Initiated <b>"+v.initiated+"</b>");
+    if (v.touches != null) parts.push("Touches <b>"+v.touches+"</b>");
+    if (v.volume != null) parts.push("Volume <b>"+fmtK(v.volume)+"</b>");
+    return "Week of <b>"+esc(k)+"</b> — " + (parts.length ? parts.join(" · ") : "nothing logged"); }).join("<br>");
+  const ml = Object.entries(S.months).sort((a,b) => b[0].localeCompare(a[0])).map(([k,v]) => {
+    const parts = [];
+    if (v.cards != null) parts.push("Cards <b>"+v.cards+"</b>");
+    if (v.loans != null) parts.push("Loans <b>"+v.loans+"</b>");
+    if (v.risk != null) parts.push("Risk <b>"+v.risk+"</b>");
+    if (v.closed != null) parts.push("Closed <b>"+v.closed+"</b>");
+    return "<b>"+esc(k)+"</b> — " + (parts.length ? parts.join(" · ") : "nothing logged"); }).join("<br>");
+  const sl = S.srfs.slice(-10).reverse().map(x => esc(x.date)+" · SRF <b>"+esc(x.srf)+"</b> · "+esc(x.kind)).join("<br>");
+  $("history").innerHTML = wl + (ml ? "<br><br>"+ml : "") + (sl ? "<br><br>Recent SRFs:<br>"+sl : ""); }
+
+/* ============ RENDER: RULES ============ */
+function renderRules(){ const q = ($("ruleSearch").value || "").toLowerCase();
+  const list = RULES.filter(r => !q || (r.t+" "+r.s).toLowerCase().includes(q));
+  $("ruleList").innerHTML = list.length ? list.map(r => '<div class="card"><h3 style="font-size:16px">'+esc(r.t)+'</h3><div class="sub">'+esc(r.s)+'</div></div>').join("") : '<div class="sub">No rule matches that search.</div>'; }
+
+/* ============ EVENTS ============ */
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x === b));
+  ["home","targets","plan","log","rules"].forEach(t => $("tab-"+t).classList.toggle("hidden", t !== b.dataset.tab));
+  if (b.dataset.tab === "log") renderLog(); if (b.dataset.tab === "targets") renderTargets();
+  window.scrollTo(0,0); });
+$("modeChip").onclick = () => { const order = [null,"prep","focus","wrap"]; const i = order.indexOf(S.modeOverride);
+  S.modeOverride = order[(i+1) % order.length]; save(); renderHome(); };
+document.querySelectorAll("[data-q]").forEach(b => b.onclick = () => { const w = wk(); const q = b.dataset.q;
+  if (q === "held") w.held = (+w.held||0)+1;
+  if (q === "si") w.si = (+w.si||0)+1;
+  if (q === "initiated") w.initiated = (+w.initiated||0)+1;
+  if (q === "booked") S.bookedAhead = (+S.bookedAhead||0)+1;
+  if (q === "volume") { const v = prompt("Volume $ to add for this week:", "10000"); const n = numOrNull(v == null ? "" : v); if (n) w.volume = (+w.volume||0)+n; }
+  if (q === "srf") { $("srfForm").classList.toggle("hidden"); renderSrfToday(); return; }
+  save(); renderHome(); });
+document.querySelectorAll("#srfKind button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("#srfKind button").forEach(x => x.classList.toggle("on", x === b)); });
+$("srfSave").onclick = () => { const v = $("srfInput").value.trim(); if (!v) { alert("Type the SRF number first."); return; }
+  const kind = (document.querySelector("#srfKind button.on") || {}).dataset ? document.querySelector("#srfKind button.on").dataset.k : "Appointment";
+  S.srfs.push({ date: dstr(new Date()), srf: v, kind: kind }); $("srfInput").value = ""; save(); renderSrfToday(); renderHome(); };
+$("saveWeek").onclick = () => { const w = wk();
+  w.held = numOrNull($("inHeld").value); w.touches = numOrNull($("inTouches").value); w.si = numOrNull($("inSi").value);
+  w.initiated = numOrNull($("inInitiated").value); w.linked = numOrNull($("inLinked").value);
+  w.myadvisor = numOrNull($("inMyadvisor").value); w.volume = numOrNull($("inVolume").value);
+  const bk = numOrNull($("inBooked").value); if (bk != null) S.bookedAhead = bk;
+  save(); renderLog(); renderHome(); alert("Week saved."); };
+$("saveMonth").onclick = () => { const m = mo();
+  m.cards = numOrNull($("inCards").value); m.loans = numOrNull($("inLoans").value);
+  m.risk = numOrNull($("inRisk").value); m.closed = numOrNull($("inClosed").value);
+  save(); renderLog(); renderHome(); alert("Month saved."); };
+document.querySelectorAll("#tfToggle button").forEach(b => b.onclick = () => { S.tf = b.dataset.tf; save(); renderTargets(); });
+$("ruleSearch").addEventListener("input", renderRules);
+$("exportBtn").onclick = () => { const blob = new Blob([JSON.stringify(S, null, 2)], { type:"application/json" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "work-growth-backup.json"; a.click(); };
+$("importBtn").onclick = () => $("importFile").click();
+$("importFile").addEventListener("change", ev => { const file = ev.target.files[0]; if (!file) return;
+  file.text().then(t => { try { const data = JSON.parse(t); if (!data.weeks || !data.months) throw new Error("bad file");
+    S = Object.assign(defState(), data); save(); renderHome(); renderTargets(); renderPlan(); renderLog(); renderRules(); alert("Backup imported."); }
+    catch(e){ alert("That file could not be imported."); } }); });
+
+/* ============ INIT ============ */
+wk(); mo(); dy(); syncDayTouches(); save();
+renderHome(); renderTargets(); renderPlan(); renderLog(); renderRules();
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>
