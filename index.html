@@ -133,7 +133,7 @@
     <div id="wrapBlock" class="hidden">
       <div class="sect">SAME-DAY RULES — MISSED TONIGHT = LOST</div>
       <div id="wrapList"></div>
-      <div class="note">The day closes when all 4 are captured. Same-day entry is not admin — it is the credit itself.</div>
+      <div class="note">The day closes when all 5 are captured. Same-day entry is not admin — it is the credit itself.</div>
     </div>
 
     <div class="rowcard hidden" id="srfForm" style="margin-top:10px">
@@ -168,6 +168,7 @@
     <div class="sect">ROAD TO BIC — TRAILING PACE VS BIC NEEDED</div>
     <div class="bicdots" id="bicDots"></div>
     <div class="monthline" id="monthLine"></div>
+    <div class="monthline" id="npsLine"></div>
     <div class="tomorrow" id="tomorrowLine"></div>
   </section>
 
@@ -218,6 +219,16 @@
       </div>
       <button class="bigbtn" id="saveMonth">Save month</button>
       <div class="note">Pre-approved cards and loans are served to the client but logged as zero here — they do not count toward these benchmarks.</div>
+    </div>
+    <div class="card"><h3>NPS — survey scores</h3>
+      <div class="sub">Target: every survey a 9 or 10. Log each score when it comes back.</div>
+      <label class="f">Score — tap one</label>
+      <div id="npsScores" style="display:flex; flex-wrap:wrap; gap:8px"></div>
+      <label class="f">Client or SRF (optional)</label>
+      <input type="text" id="npsNote" placeholder="Optional">
+      <button class="bigbtn" id="npsSave">Save score</button>
+      <div id="npsSummary" style="margin-top:12px"></div>
+      <div id="npsList" class="hist" style="margin-top:8px"></div>
     </div>
     <div class="card"><h3>History</h3><div class="note" style="margin-bottom:8px">Fixing a mistake: week and month numbers — edit the form above and save again, it overwrites. A wrong tap — Undo on Home. A wrong appointment or SRF — Delete it here.</div><div class="hist" id="history"></div></div>
     <div class="card">
@@ -312,6 +323,10 @@ const TARGETS = [
     ours:{w:"$769,231", m:"$3,333,333", y:"$40,000,000"}, oursNum:{w:769231, m:3333333, y:40000000},
     bic:{w:"—", m:"—", y:"—"}, bicNum:{w:0, m:0, y:0}, mult:"personal target",
     note:"No official BIC line. Branch new-money bar inside it: $175K/week. Renewals, PAC volume (365 days) and referral volume (180-day windows) feed this." },
+  { id:"nps", name:"NPS — survey score per client", drive:"month",
+    ours:{w:"9–10", m:"9–10", y:"9–10"}, oursNum:{w:10, m:10, y:10},
+    bic:{w:"—", m:"—", y:"—"}, bicNum:{w:0, m:0, y:0}, mult:"promoters only — set 2026-11-15",
+    note:"Every survey a 9 or 10. 9–10 = promoter (counts for you) · 7–8 = passive (counts for nothing) · 0–6 = detractor (pulls your NPS down). Log every score in the Log tab. The closing script is in Plan." },
 ];
 const PLAN = [
   { t:"Appointments — 30 / 35 / 40 per week", steps:[
@@ -319,7 +334,29 @@ const PLAN = [
     "Book-before-they-leave: every appointment ends with the next one booked.",
     "Protect renewal appointments first — they carry the highest dollars.",
     "Fill weak days from the leads list, worked end-to-end daily — not by hoping.",
-    "Measure Friday: held this week + booked for each of the next 3 weeks. A future week under 30 booked is next week's #1 job." ] },
+    "Measure Friday: held this week + booked for each of the next 3 weeks. A future week under 30 booked is next week's #1 job.",
+    "EVERY BOOKING CHANNEL: (1) book-before-they-leave, (2) light touches — reviews, 3-month check-ins, birthdays, (3) leads list / campaign leads worked daily, (4) renewal & maturity lists, (5) customer-service duty conversions — book it while they're in front of you, (6) partner hand-ups + spouse/family joint bookings, (7) assisted-digital follow-ups inside the 5-day window, (8) online bookings confirmed the same day, (9) no-show backfill list, (10) seasonal pushes — TFSA/RRSP season, FHSA, year-end.",
+    "Confirm every booking, then remind TWICE — 3 days before and 1 day before. Reminder research (healthcare trial, 54,066 people): two reminders cut no-shows to 4.4% vs 5.3–5.8% for one; texts work as well as calls.",
+    "Work a list to about 6 attempts across call + email over 2–3 weeks before parking it — ~93% of conversions are reached by attempt 6 (cross-industry lead data). Every touch carries a new reason — a maturity, a rate, a life event — never a bare 'just checking in'." ] },
+  { t:"NPS — every survey a 9 or 10 (the closing script)", steps:[
+    "Before the client leaves, ask: 'Is there anything else I could have done today to make this easier for you?' Problems surface while you can still fix them.",
+    "Then the close, word for word: 'You may get a short survey by email about today's visit — it's about me personally. If anything today wasn't a 10 for you, I'd rather you tell me now and I fix it, than read it later.' Then stop talking and listen.",
+    "If they name something: fix it on the spot, or commit to a time — and keep it.",
+    "Follow up the same or next day with a short call: 'Everything's set up as we discussed.' A completed call, not an attempt — follow-through is what clients describe when they explain a 10.",
+    "Add one unasked thing per appointment: a fee they could avoid, a better option they didn't know about, the next review booked before they leave.",
+    "Never offer anything for a score, and never mention the survey only to happy clients. You ask for the chance to fix, not for a number.",
+    "Log every score that comes back in the Log tab — promoters, passives and detractors all count." ] },
+  { t:"What the data says — the evidence playbook", steps:[
+    "RESOLVE IT IN THE ROOM. Transactional NPS is 64 when a client's issue is resolved on first contact, 40 if it takes repeat contacts, −38 if it takes 2+ contacts and stays unresolved (SQM Group). Every +1% first-contact resolution ≈ +1.4 NPS points. Before they leave: the need fully closed, the next step owned by you, with a date.",
+    "ADVICE THAT COMPLETELY MEETS THE NEED. J.D. Power Canada: satisfaction +235 points (of 1,000) when advice completely meets needs — banks manage it only ~51% of the time, and 74% of clients act on advice they receive. Driver order: clarity, then concern, then relevance. In the meeting, name their situation back to them and ask: 'Does that cover everything you were worried about?'",
+    "FOLLOW UP WITHIN 48 HOURS. Firms that close the loop with unhappy clients within 48 hours gain ~+6 NPS and +12% retention (CustomerGauge — B2B data; no banking-specific study exists, direction is consistent, size unproven). A completed call beats an attempted one: two tries at different times of day, then a text.",
+    "RECOVER TO AVOID THE HOLE, NOT FOR A BONUS. In banking the 'recovery paradox' is rare and small (Michel & Meuter, 11,000+ bank clients). Fix problems fast and fairly because unresolved problems sit at −38 — not because a fixed problem out-scores a flawless visit.",
+    "START DIGITAL IN THE ROOM. 68% of consumers abandoned a financial application in the past year; top reasons are time and data burden (Signicat, 7,600 consumers). Open the app together, finish verification, set up the first automation, confirm they can log in alone. 'I'll send you the link' sends the solution into a process two in three people abandon.",
+    "DISCOVERY BREADTH IS THE ENGINE. Advisors who cover the whole picture cover about twice the planning areas (2.79 vs 1.59 of 6), and their clients are very satisfied 62% vs 44% (CFP Board, 2025). Run the same health-check frame every time — cash flow, buffer, debt, protection, investing, estate — and write down gaps you don't solve today: unsolved gaps are the next appointment's agenda.",
+    "STACK FROM THE GAP MAP, NEVER FROM A QUOTA. Solve 2–3 linked needs in the meeting while the client is engaged. Cautionary tale: Wells Fargo's pushed '8 products per household' target ended with ~3.5 million unauthorised accounts and a $3B settlement. Stacking anchored to a documented need protects NPS; stacking to hit a ratio destroys it.",
+    "REFERRALS: BE REFERABLE, ASK ONCE, SPECIFICALLY. Referrals bring 54–67% of advisors' new clients and convert in 1.7 months vs 3.6 for marketing (Cerulli; Broadridge). But practices that ask clients more than once a year show LOWER referral growth — 3.0% vs 5.4% for never asking (Kitces, 506 practices). The synthesis: at a real value moment, say once who you help and with what problem — 'people dealing with a first mortgage, an inheritance, a business sale; if someone you know hits that, I'm happy to have a no-obligation chat' — ask for an introduction rather than a name, then rely on the standing invitation.",
+    "REFERRED CLIENTS ARE WORTH MORE. Peer-reviewed banking study (~10,000 customers, Journal of Marketing 2011): referred clients had 16% higher lifetime value and 18% lower churn. Referred prospects jump your call queue and get your best slots — and the referrer gets thanked the same week. That loop produces the next referral.",
+    "WHAT 'STRONG' NPS LOOKS LIKE. Banking averages run ~19–30 (QuestionPro US tracking; CustomerGauge). A personal transactional NPS in the 50s–60s is strong, and above 50 is Bain's 'excellent' band. Judge yourself against that — not against 100." ] },
   { t:"MyAdvisor — 12 per week", steps:[
     "Start every appointment in MyAdvisor discovery — it is where cards, loans, risk and referrals are found.",
     "Your floor is 12 a week. The branch bar is 80% of appointments, so every one above 12 is ground gained toward it.",
@@ -387,6 +424,7 @@ const WRAP_ITEMS = [
   { id:"c360", t:"Enter today's referrals in C360", s:"same-day entry still counts" },
   { id:"indicate", t:"Indicate today's assisted opens", s:"NOMI + PAC — the 5-day clock starts now" },
   { id:"day45", t:"Day-45 check on open savings", s:"confirm $100+ is still in" },
+  { id:"followup", t:"Follow up today's clients", s:"short call — thank them, confirm it's working, plant the survey close" },
 ];
 </script>
 
@@ -396,7 +434,7 @@ const WRAP_ITEMS = [
 const KEY = "workgrowth_v1";
 function defState(){ return { weeks:{}, months:{}, days:{}, srfs:[], appts:[], bookedAhead:4,
   focusOverride:null, modeOverride:null, ltChannel:"phone", tf:"m",
-  theme:"ocean", custom:{ bg:"#102A54", card:"#183A6E", accent:"#FFCD5A" }, fontScale:1, undo:[] }; }
+  theme:"ocean", custom:{ bg:"#102A54", card:"#183A6E", accent:"#FFCD5A" }, fontScale:1, undo:[], nps:[] }; }
 const THEMES = [
   { id:"ocean", name:"Ocean", bg:"#102A54", accent:"#FFCD5A" },
   { id:"midnight", name:"Midnight", bg:"#0A0A0C", accent:"#FF3B30" },
@@ -424,14 +462,15 @@ function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){
 function uid(){ return Date.now().toString(36) + Math.floor(Math.random()*1e6).toString(36); }
 function normalize(){ if (!Array.isArray(S.undo)) S.undo = [];
   (S.appts || []).forEach((a, i) => { if (!a.id) a.id = "legacy-a" + i; });
-  (S.srfs || []).forEach((x, i) => { if (!x.id) x.id = "legacy-s" + i; }); }
+  (S.srfs || []).forEach((x, i) => { if (!x.id) x.id = "legacy-s" + i; });
+  if (!Array.isArray(S.nps)) S.nps = []; S.nps.forEach((x, i) => { if (!x.id) x.id = "legacy-n" + i; }); }
 normalize();
 function wByKey(k){ if (!S.weeks[k]) S.weeks[k] = { held:0, booked:0, touches:0, si:0, initiated:0, linked:0, myadvisor:0, volume:0 }; return S.weeks[k]; }
 function mByKey(k){ if (!S.months[k]) S.months[k] = { cards:0, loans:0, risk:0, closed:0 }; return S.months[k]; }
 function pushUndo(u){ S.undo.push(u); if (S.undo.length > 60) S.undo.splice(0, S.undo.length - 60); }
 function describeUndo(u){ return ({ si:"+1 S&I", initiated:"+1 initiated referral", booked:"+1 booked ahead",
   volume:"+$" + (u.amt || 0).toLocaleString("en-CA") + " volume", srf:"SRF " + u.srf,
-  appt:"Appointment " + u.srf + " (" + (u.n || 0) + " products)" })[u.k] || "a tap"; }
+  nps:"NPS score " + u.score, appt:"Appointment " + u.srf + " (" + (u.n || 0) + " products)" })[u.k] || "a tap"; }
 function reverseAppt(a){ const wkK = a.wk || dstr(mondayOf(new Date(a.date + "T12:00:00"))), mkK = a.mk || String(a.date).slice(0, 7);
   const w = wByKey(wkK), m = mByKey(mkK);
   w.held = Math.max(0, (+w.held || 0) - 1);
@@ -452,6 +491,7 @@ function applyUndo(u){ if (!u) return;
   else if (u.k === "volume") { const w = wByKey(u.wk); w.volume = Math.max(0, (+w.volume || 0) - (u.amt || 0)); }
   else if (u.k === "booked") { S.bookedAhead = Math.max(0, (+S.bookedAhead || 0) - 1); }
   else if (u.k === "srf") { S.srfs = S.srfs.filter(x => x.id !== u.id); }
+  else if (u.k === "nps") { S.nps = S.nps.filter(x => x.id !== u.id); }
   else if (u.k === "appt") { const a = S.appts.find(x => x.id === u.id); if (a) reverseAppt(a); } }
 
 /* ============ DATE HELPERS ============ */
@@ -469,7 +509,7 @@ function mo(){ const k = monthKeyOf(new Date());
   if (!S.months[k]) S.months[k] = { cards:0, loans:0, risk:0, closed:0 };
   return S.months[k]; }
 function dy(){ const k = dstr(new Date());
-  if (!S.days[k]) S.days[k] = { touches:[], partner:false, book:false, wrap:{ srf:false, c360:false, indicate:false, day45:false } };
+  if (!S.days[k]) S.days[k] = { touches:[], partner:false, book:false, wrap:{ srf:false, c360:false, indicate:false, day45:false, followup:false } };
   return S.days[k]; }
 function todaySrfs(){ const t = dstr(new Date()); return S.srfs.filter(x => x.date === t); }
 
@@ -514,7 +554,7 @@ function renderHome(){ const mode = curMode(), day = dy(), w = wk();
   const fc = $("focusCard");
   if (mode === "wrap") { const done = WRAP_ITEMS.filter(i => day.wrap[i.id]).length;
     fc.innerHTML = '<div class="kicker"><span>CAPTURE TODAY</span></div><h2>Credit is won tonight</h2>'
-      + '<div class="stat">'+done+' of 4 done</div><div class="bar"><div class="green" style="width:'+(done/4*100)+'%"></div></div>'
+      + '<div class="stat">'+done+' of '+WRAP_ITEMS.length+' done</div><div class="bar"><div class="green" style="width:'+(done/WRAP_ITEMS.length*100)+'%"></div></div>'
       + '<div class="why">Same-day entry is not admin — it is the credit itself.</div>';
   } else { const f = curFocus();
     fc.innerHTML = '<div class="kicker"><span>ONE JOB THIS WEEK</span><button id="swapFocus">Swap focus</button></div>'
@@ -559,6 +599,8 @@ function renderHome(){ const mode = curMode(), day = dy(), w = wk();
   $("bicDots").innerHTML = dots.map(d => '<span class="bicdot"><span class="dot '+(d[1] == null ? "" : d[1] >= d[2] ? "g" : d[1] >= d[2]*0.8 ? "a" : "r")+'"></span>'+d[0]+'</span>').join("");
   const m = mo();
   $("monthLine").textContent = "Month: Cards "+(m.cards ?? 0)+"/4 · Loans "+(m.loans ?? 0)+"/3 · Risk "+(m.risk ?? 0)+"/2 · Closed "+(m.closed ?? 0)+"/10";
+  const ns = npsStats();
+  $("npsLine").textContent = ns ? "NPS: " + ns.n + " surveys · " + ns.p + "% promoters · NPS " + (ns.score >= 0 ? "+" : "") + ns.score : "NPS: no surveys logged yet — target: every survey a 9 or 10.";
   const L = focusList(); const low = L.reduce((a,b) => b.ratio < a.ratio ? b : a, L[0]);
   $("tomorrowLine").textContent = low.ratio >= 1 ? "Tomorrow's focus: keep the pace — protect the renewals." : "Tomorrow's focus: "+low.title.toLowerCase()+".";
   const lastU = S.undo && S.undo.length ? S.undo[S.undo.length - 1] : null;
@@ -623,12 +665,27 @@ function renderLog(){ const w = wk(), m = mo();
     S.undo = S.undo.filter(u => !(u.k === "srf" && u.id === b.dataset.srfdel)); save(); renderLog(); renderHome(); });
   document.querySelectorAll("[data-apptdel]").forEach(b => b.onclick = () => { const a = S.appts.find(x => x.id === b.dataset.apptdel); if (!a) return;
     if (!confirm("Delete this appointment? Held, its products and its volume come off your week and month automatically.")) return;
-    reverseAppt(a); save(); renderLog(); renderHome(); }); }
+    reverseAppt(a); save(); renderLog(); renderHome(); }); renderNps(); }
 
 /* ============ RENDER: RULES ============ */
 function renderRules(){ const q = ($("ruleSearch").value || "").toLowerCase();
   const list = RULES.filter(r => !q || (r.t+" "+r.s).toLowerCase().includes(q));
   $("ruleList").innerHTML = list.length ? list.map(r => '<div class="card"><h3 style="font-size:16px">'+esc(r.t)+'</h3><div class="sub">'+esc(r.s)+'</div></div>').join("") : '<div class="sub">No rule matches that search.</div>'; }
+
+/* ============ NPS ============ */
+let npsSel = null;
+function npsStats(){ const a = S.nps || []; if (!a.length) return null;
+  const P = a.filter(x => x.score >= 9).length, D = a.filter(x => x.score <= 6).length;
+  return { n: a.length, p: Math.round(P / a.length * 100), pa: Math.round((a.length - P - D) / a.length * 100), d: Math.round(D / a.length * 100), score: Math.round((P - D) / a.length * 100) }; }
+function renderNps(){ const sc = $("npsScores"); if (!sc) return;
+  sc.innerHTML = Array.from({ length: 11 }, (_, i) => '<button class="pchip' + (npsSel === i ? " on" : "") + '" data-nps="' + i + '">' + i + '</button>').join("");
+  document.querySelectorAll("#npsScores .pchip").forEach(c => c.onclick = () => { npsSel = +c.dataset.nps; renderNps(); });
+  const st = npsStats();
+  $("npsSummary").innerHTML = st ? '<b>' + st.n + ' surveys</b> · ' + st.p + '% promoters · ' + st.pa + '% passive · ' + st.d + '% detractors · <b>NPS ' + (st.score >= 0 ? "+" : "") + st.score + '</b>' : '<span class="sub">No surveys logged yet.</span>';
+  $("npsList").innerHTML = (S.nps || []).slice(-8).reverse().map(x => '<div style="padding:3px 0">' + esc(x.date) + ' · <b style="color:' + (x.score >= 9 ? "var(--good)" : x.score <= 6 ? "var(--bad)" : "var(--muted)") + '">Score ' + x.score + '</b>' + (x.note ? ' · ' + esc(x.note) : '') + ' <button class="ghostbtn" data-npsdel="' + esc(x.id) + '" style="padding:2px 10px; font-size:12px; margin-left:6px">Delete</button></div>').join("");
+  document.querySelectorAll("[data-npsdel]").forEach(b => b.onclick = () => { if (!confirm("Delete this NPS score?")) return;
+    S.nps = S.nps.filter(x => x.id !== b.dataset.npsdel);
+    S.undo = S.undo.filter(u => !(u.k === "nps" && u.id === b.dataset.npsdel)); save(); renderNps(); renderHome(); }); }
 
 /* ============ STYLE: THEMES + FONT ============ */
 function applyTheme(){ const root = document.documentElement;
@@ -699,6 +756,11 @@ $("srfSave").onclick = () => { const v = $("srfInput").value.trim(); if (!v) { a
   const kind = (document.querySelector("#srfKind button.on") || {}).dataset ? document.querySelector("#srfKind button.on").dataset.k : "Appointment";
   const rec = { id: uid(), date: dstr(new Date()), srf: v, kind: kind }; S.srfs.push(rec);
   pushUndo({ k:"srf", id: rec.id, srf: v }); $("srfInput").value = ""; save(); renderSrfToday(); renderHome(); };
+$("npsSave").onclick = () => { if (npsSel == null) { alert("Tap the score first (0–10)."); return; }
+  const rec = { id: uid(), date: dstr(new Date()), score: npsSel, note: $("npsNote").value.trim() };
+  S.nps.push(rec); pushUndo({ k:"nps", id: rec.id, score: rec.score });
+  npsSel = null; $("npsNote").value = ""; save(); renderNps(); renderHome();
+  alert("NPS score " + rec.score + " saved." + (rec.score >= 9 ? " Promoter — that's the target." : rec.score <= 6 ? " Detractor — if you know who it was, a follow-up call within 48 hours is the play." : " Passive — close, but 7–8 counts for nothing. The gap is usually one unasked thing, or a missing follow-up.")); };
 $("saveWeek").onclick = () => { const w = wk();
   w.held = numOrNull($("inHeld").value); w.touches = numOrNull($("inTouches").value); w.si = numOrNull($("inSi").value);
   w.initiated = numOrNull($("inInitiated").value); w.linked = numOrNull($("inLinked").value);
