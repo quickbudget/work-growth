@@ -169,6 +169,7 @@
     <div class="bicdots" id="bicDots"></div>
     <div class="monthline" id="monthLine"></div>
     <div class="monthline" id="npsLine"></div>
+    <div class="monthline" id="opensLine"></div>
     <div class="tomorrow" id="tomorrowLine"></div>
   </section>
 
@@ -229,6 +230,16 @@
       <button class="bigbtn" id="npsSave">Save score</button>
       <div id="npsSummary" style="margin-top:12px"></div>
       <div id="npsList" class="hist" style="margin-top:8px"></div>
+    </div>
+    <div class="card"><h3>Indicated opens — the 5-day clock</h3>
+      <div class="sub">When you indicate a digital open, log it here the same day. The client has 5 days to finish — this list is your follow-up list. Best call day: day 2–3.</div>
+      <label class="f">Client name</label>
+      <input type="text" id="openClient" placeholder="Client name">
+      <label class="f">Product — tap one</label>
+      <div id="openProducts" style="display:flex; flex-wrap:wrap; gap:8px"></div>
+      <button class="bigbtn" id="openAdd">Add — indicated today</button>
+      <div id="openList" class="hist" style="margin-top:10px"></div>
+      <div id="openDone" style="margin-top:8px"></div>
     </div>
     <div class="card"><h3>History</h3><div class="note" style="margin-bottom:8px">Fixing a mistake: week and month numbers — edit the form above and save again, it overwrites. A wrong tap — Undo on Home. A wrong appointment or SRF — Delete it here.</div><div class="hist" id="history"></div></div>
     <div class="card">
@@ -357,6 +368,77 @@ const PLAN = [
     "REFERRALS: BE REFERABLE, ASK ONCE, SPECIFICALLY. Referrals bring 54–67% of advisors' new clients and convert in 1.7 months vs 3.6 for marketing (Cerulli; Broadridge). But practices that ask clients more than once a year show LOWER referral growth — 3.0% vs 5.4% for never asking (Kitces, 506 practices). The synthesis: at a real value moment, say once who you help and with what problem — 'people dealing with a first mortgage, an inheritance, a business sale; if someone you know hits that, I'm happy to have a no-obligation chat' — ask for an introduction rather than a name, then rely on the standing invitation.",
     "REFERRED CLIENTS ARE WORTH MORE. Peer-reviewed banking study (~10,000 customers, Journal of Marketing 2011): referred clients had 16% higher lifetime value and 18% lower churn. Referred prospects jump your call queue and get your best slots — and the referrer gets thanked the same week. That loop produces the next referral.",
     "WHAT 'STRONG' NPS LOOKS LIKE. Banking averages run ~19–30 (QuestionPro US tracking; CustomerGauge). A personal transactional NPS in the 50s–60s is strong, and above 50 is Bain's 'excellent' band. Judge yourself against that — not against 100." ] },
+  { t:"Field guide — finding the appointments (where + what to look for)", steps:[
+    "BOOK-BEFORE-THEY-LEAVE — the last 2 minutes of every appointment: name the next reason out loud (a maturity date, a pending item, a life event they mentioned), offer two specific times, book it. No open thread? Book the annual review anyway.",
+    "LIGHT TOUCHES — where: C360, your assigned clients. Look for: no contact in 90+ days · a product maturing · a PAC flat for a year · birthdays and 3-month check-ins. Pick 15 names at Monday prep, 3 a day, each with ONE specific reason — never 'just checking in'.",
+    "LEADS LIST — where: Client Connect / C360 campaign leads. Work it top-down every morning, newest first — a lead called the day it lands books far more often. Look for the product-interest tag and any life-event note; that is your opening line, not the product.",
+    "RENEWAL & MATURITY LISTS — look for: GICs maturing in 30–60 days · mortgage renewals inside 90–120 days · PACs due for review. Call 45–60 days BEFORE maturity, not the week of — the renewal appointment is where the PAC increase and the new GIC live.",
+    "CS-DUTY CONVERSIONS — during your 5–6 service hours, listen for: 'I should really…' · a fee complaint · a maturing product mentioned in passing · a life change (new job, baby, house). Solve the small thing first, then book the sit-down before they walk away — a name on a sticky note is not a booking.",
+    "PARTNER HAND-UPS — at the 8:30 prep, name the client each partner meets today, and ask who they are seeing that needs you. Introduce by name, in person where possible, enter it in C360 the same day. Hand-ups flow toward the advisor who hands out.",
+    "ASSISTED-DIGITAL FOLLOW-UPS — your own indications are the list (the tracker in the Log tab). Look for day 2–4 and not finished. One call finishes the open inside the 5-day window — and often books the next appointment too.",
+    "ONLINE BOOKINGS — confirm every digital booking the same day, with a short call or message. An unconfirmed booking is a no-show waiting to happen; the confirmation is also where you learn why they are coming, so prep starts early.",
+    "BACKFILL LIST — when a happy client says 'anytime', ask: 'If a slot opens this week, can I call you?' Keep 3–4 names with numbers. The moment a cancellation lands, call down the list before the slot cools.",
+    "SEASONAL PUSHES — January TFSA room · Feb–Mar RRSP deadline · FHSA before year-end · December year-end reviews. Pull the matching slice of your book 3–4 weeks ahead (who has TFSA room, who has not opened an FHSA) and work it like the leads list. These weeks book above 35 — they bank the average for the quiet ones." ] },
+  { t:"Field guide — running the plays (step by step)", steps:[
+    "RESOLVE IT IN THE ROOM — the closing checklist: (1) the original need fully DONE, not 'submitted' (2) documents complete (3) the digital step finished WITH them, not assigned as homework (4) anything pending carries YOUR name and a date — never 'someone will call you' (5) ask: 'Does that cover everything you were worried about?'",
+    "THE HEALTH CHECK — the same six areas, every advice appointment, in this order: cash flow → emergency buffer → debt → protection → investing/retirement → estate basics. Look for: buffer under 3 months · debt above ~5% interest while savings sit idle · no protection with dependants · money idle in chequing. Write down EVERY gap you find — unsolved gaps are today's stacking list and the next appointment's agenda.",
+    "START DIGITAL IN THE ROOM — open the app together → finish identity verification → set up the first automation (the PAC, the NOMI rule) → have THEM log in once, unaided, before they leave.",
+    "STACKING — lay the gap map in front of the client and solve 2–3 linked needs in the meeting (account + savings automation + protection). Anchor every solution to a gap you both saw — never to a quota.",
+    "THE 48-HOUR FOLLOW-UP BLOCK — a fixed block every day, in this order: (1) anyone with a problem or a pending item (2) anyone you promised something (3) everyone else from yesterday — 60 seconds: thank-you plus 'is everything working?' A COMPLETED conversation counts; an attempt does not. Two tries at different times of day, then a text.",
+    "THE REFERRAL ASK — once, at a real value moment (problem solved, plan completed, money saved), never as a routine closing line. Ask for an INTRODUCTION, not just a name. Then: contact the person within the hour or the same day · thank the referrer the same week · tell the referrer when the meeting happens.",
+    "THE 6-ATTEMPT SEQUENCE — Day 0: call + voicemail + a message with a specific reason and two offered times → Day 2–3: call at a different time of day → Day 5–7: call + email → Day 10–14: final call + a 'closing the loop' message → park it with a wake-up date (a maturity, a life event, 90 days). Every attempt carries a NEW reason.",
+    "REMINDERS — confirm at booking · remind 3 days before, and double it as prep: 'anything else on your mind for Thursday?' · remind 1 day before. Two reminders beat one; a text works as well as a call." ] },
+  { t:"Script — Light touch / review invitation", steps:[
+    "CALL — 'Hi [Name], it's [Your name] from RBC [branch]. I was reviewing your accounts this week and noticed [the specific reason — your savings has sat at the same rate since June / your GIC matures next month / we have not reviewed things since you started the new job]. I think there's a better option for you. I have [Thursday at 2] or [Friday at 10] — does one of those work for a 20-minute sit-down?'",
+    "VOICEMAIL — 'Hi [Name], it's [Your name] from RBC [branch], [phone]. I was reviewing your accounts and spotted [the specific reason] — I'd like to show you a better option. I'll try you again [tomorrow]; or call me back and we'll find 20 minutes this week. [Your name], RBC, [phone].'",
+    "EMAIL — Subject: 'A better option for your [savings/GIC] — 20 minutes?' Body: 'Hi [Name], I reviewed your accounts this week and noticed [the specific reason]. There's a better option I'd like to walk you through — it takes about 20 minutes. I have [Thursday 2:00] or [Friday 10:00] open, or tell me a time that suits you. — [Your name], RBC [branch], [phone]'" ] },
+  { t:"Script — Renewal or maturity coming due", steps:[
+    "CALL — 'Hi [Name], it's [Your name] from RBC. Your [GIC/mortgage] comes due on [date], and I'm calling early on purpose — while you still have time to choose, instead of rushing in the last week. There are a couple of options worth comparing, including [one specific hook — a rate, a PAC increase, a structure change]. Can we sit down [option 1] or [option 2]?'",
+    "VOICEMAIL — 'Hi [Name], [Your name] from RBC, [phone]. Your [GIC/mortgage] matures on [date] and I'm calling early so you have real options. There are a couple worth comparing before it renews by default. Call me back and we'll book 20 minutes — [phone].'",
+    "EMAIL — Subject: 'Your [GIC/mortgage] matures [date] — options before it renews' Body: 'Hi [Name], your [GIC/mortgage] comes due on [date]. If it simply rolls over, it renews at the default — there may be better options, including [the hook]. I'd suggest we look at them in the next two weeks, while there's time to choose. I have [option 1] and [option 2]. — [Your name], RBC [branch], [phone]'" ] },
+  { t:"Script — First call to a lead", steps:[
+    "CALL — 'Hi [Name], it's [Your name] from RBC [branch]. You [asked about X / looked into Y] recently, and it came to me. I help clients with exactly that — the first conversation is about 20 minutes, no obligation, and you'll leave knowing your options. I have [option 1] or [option 2] — which suits you?' (Never say 'you are on a list'.)",
+    "VOICEMAIL — 'Hi [Name], [Your name] from RBC [branch], [phone]. You'd asked about [X] — I work with clients on exactly that and I'm happy to walk you through the options in 20 minutes, no obligation. I'll try again [tomorrow], or reach me at [phone].'",
+    "EMAIL — Subject: 'Your question about [X] — 20 minutes?' Body: 'Hi [Name], you recently looked into [X] and it was passed to me. I help clients with this every week. A short conversation — about 20 minutes — and you'll know your options clearly. I have [option 1] or [option 2] this week. — [Your name], RBC [branch], [phone]'" ] },
+  { t:"Script — Dormant client reactivation", steps:[
+    "CALL — 'Hi [Name], it's [Your name] from RBC — I look after your accounts here. It's been a while since anyone reviewed things with you, and a lot has changed since [the year/their product]. I'd like to make sure nothing is quietly costing you money. Twenty minutes — I have [option 1] or [option 2].'",
+    "VOICEMAIL — 'Hi [Name], [Your name] from RBC, [phone]. I look after your accounts, and it's been a while since your last review — a few things have changed that are worth a look. Call me at [phone] and we'll find 20 minutes.'",
+    "EMAIL — Subject: 'It's been a while — a quick review of your accounts?' Body: 'Hi [Name], I'm [Your name] — I look after your accounts at RBC [branch]. Your last review was a while ago, and rates and options have moved since then. A 20-minute review makes sure nothing is costing you quietly. I have [option 1] or [option 2]. — [Your name], [phone]'" ] },
+  { t:"Script — Seasonal: TFSA / RRSP / FHSA deadline", steps:[
+    "CALL — 'Hi [Name], it's [Your name] from RBC. Before [the RRSP deadline / the new year], I checked your [TFSA — you have room available / FHSA — you haven't opened one yet, and it can lower your tax bill]. It's worth 20 minutes before [deadline], because after that date the option is gone for this year. I have [option 1] or [option 2].'",
+    "VOICEMAIL — 'Hi [Name], [Your name] from RBC, [phone]. Quick one: you still have [TFSA room / an FHSA to open] before [deadline] — after that date, this year's option is gone. Worth 20 minutes; call me at [phone].'",
+    "EMAIL — Subject: 'Before [deadline]: your [TFSA room / FHSA]' Body: 'Hi [Name], a quick heads-up: you still have [the specific opportunity] available, and it closes on [deadline]. Twenty minutes is enough to use it well. I have [option 1] or [option 2] this week. — [Your name], RBC [branch], [phone]'" ] },
+  { t:"Script — Indicated open: finish the last step", steps:[
+    "CALL — 'Hi [Name], it's [Your name] from RBC. When we spoke on [day], you started [the savings account / your PAC] — there's one last step to finish it, and it takes about two minutes. I can walk you through it right now on this call — or if it's easier, come by and we'll do it side by side. Finishing by [window date] keeps it exactly as we planned.'",
+    "VOICEMAIL — 'Hi [Name], [Your name] from RBC, [phone]. You started [the product] on [day] — one step left, about two minutes, and the window to finish closes [window date]. Call me at [phone] and we'll close it together.'",
+    "EMAIL — Subject: 'One step left on your [product] — 2 minutes' Body: 'Hi [Name], you started [the product] on [day]. There's one final step to activate it — about two minutes. I can walk you through it by phone, or book you in and we'll finish it side by side. The window for this one closes [window date]. Just reply, or call [phone]. — [Your name]'" ] },
+  { t:"Script — Confirmation and reminders", steps:[
+    "AT BOOKING — 'You're booked for [day at time] with me at [branch]. I'll remind you a few days before. If anything changes, call me directly at [phone] and we'll move it — no problem at all.'",
+    "3 DAYS BEFORE (call, text or email) — 'Hi [Name], [Your name] from RBC — looking forward to [Thursday at 2]. We'll be looking at [the reason/agenda]. Anything else on your mind that you want me to prepare for? Just let me know. And if you need to bring anything, it's [the item].'",
+    "1 DAY BEFORE — 'Quick reminder: tomorrow at [time], RBC [branch], with me — [Your name]. See you then.' (Short on purpose. Add one practical detail if you have one — parking, entrance, what to bring.)" ] },
+  { t:"Script — No-show recovery", steps:[
+    "CALL (same day, zero guilt) — 'Hi [Name], it's [Your name] from RBC — we had [today at 2] booked and I missed you. No problem at all, things come up. I have your file ready — I can do [tomorrow at 11] or [Friday at 3] instead. Which suits you better?'",
+    "VOICEMAIL — 'Hi [Name], [Your name] from RBC, [phone]. We had [time] booked today — no problem at all, life happens. Your file is ready when you are: I can do [option 1] or [option 2]. Call me at [phone] and we'll rebook.'",
+    "EMAIL — Subject: 'Let's rebook — your file is ready' Body: 'Hi [Name], we missed each other at [time] today — no problem at all. Everything is prepared on my side. I have [option 1] or [option 2] open, or suggest a time that works better. — [Your name], [phone]'" ] },
+  { t:"Script — Post-appointment follow-up (the 48-hour call)", steps:[
+    "CALL — 'Hi [Name], it's [Your name] from RBC — just closing the loop on [Tuesday]. Everything we set up is in place: [the PAC starts Friday / the account is active / the application is submitted and on track]. Is everything working the way you expected?' Then listen. If anything is off, fix it or name the date you will. Close with: 'If anything ever feels off, call me directly — you don't need to wait for an appointment.'",
+    "IF THE SURVEY WASN'T COVERED IN PERSON — add: 'You may get a short survey about our meeting. If anything wasn't a 10 for you, I'd rather hear it from you now and fix it.' Then stop and listen.",
+    "VOICEMAIL — 'Hi [Name], [Your name] from RBC, [phone] — closing the loop on [Tuesday]: everything we set up is in place, [the one-line status]. If anything isn't working as expected, call me directly at [phone]. Thanks again.'" ] },
+  { t:"Script — First call to a referred prospect", steps:[
+    "CALL — 'Hi [Name], it's [Your name] from RBC [branch]. [Referrer] mentioned you're [dealing with the specific thing — buying your first home / sorting out an inheritance / starting a business] and suggested we talk. I help a lot of clients with exactly that. No obligation — a 20-minute conversation and you'll know your options. I have [option 1] or [option 2].'",
+    "VOICEMAIL — 'Hi [Name], [Your name] from RBC, [phone]. [Referrer] suggested I reach out — they mentioned you're [dealing with the thing], and it's something I help clients with every week. Happy to chat for 20 minutes, no obligation. I'll try again [tomorrow], or [phone].'",
+    "EMAIL — Subject: '[Referrer] suggested we talk' Body: 'Hi [Name], [Referrer] mentioned you're [dealing with the thing] and thought I could help. It's a big part of what I do. A 20-minute conversation — no obligation — and you'll have your options clearly. I have [option 1] or [option 2]. — [Your name], RBC [branch], [phone]'" ] },
+  { t:"Script — Thanking the referrer", steps:[
+    "CALL OR TEXT — 'Hi [Referrer], thank you for introducing me to [Name] — we spoke today and [we're meeting Thursday / I've pointed them in the right direction]. I appreciate the trust, and I'll take good care of them.'",
+    "THEN, ONCE — the standing invitation: 'And the same offer stands for anyone you know dealing with [the specific problem — a first mortgage, an inheritance, a business sale]. I'm happy to have a no-obligation chat.' Say it once. Then stop — do not ask again at the next meeting.",
+    "EMAIL — Subject: 'Thank you' Body: 'Hi [Referrer], just a quick thank-you for introducing me to [Name]. We spoke today and [the status]. I appreciate you thinking of me — I'll look after them. — [Your name]'" ] },
+  { t:"Script — Backfill: a slot opened up", steps:[
+    "CALL — 'Hi [Name], it's [Your name] from RBC. You told me to call if a slot opened up — one just did: [tomorrow at 11]. It's yours if you want it. If the timing's wrong, no pressure at all — I'll call again next time one opens.'",
+    "VOICEMAIL — 'Hi [Name], [Your name] from RBC, [phone]. A slot just opened for [day at time] and you were first on my list. If you'd like it, call me at [phone] — I'll hold it until [time]. If not, no problem, you'll stay on the list.'" ] },
+  { t:"Script — At the service desk: turning service into a sit-down", steps:[
+    "AT THE DESK — 'I can fix this one right now. But honestly, [the bigger thing you noticed] deserves a proper look, not a counter conversation. I have [Thursday at 2] or [Friday at 10] — I'll book you in and have everything ready.'",
+    "IF THEY CAN'T DECIDE — 'No problem — I'll hold [Thursday at 2] until tomorrow. If it doesn't suit, just let me know and we'll find another time.' (Holding the slot is what makes the follow-up email real.)",
+    "FOLLOW-UP EMAIL — Subject: 'Your [Thursday 2:00] slot — held until tomorrow' Body: 'Hi [Name], good seeing you today. As mentioned, [the bigger thing] is worth a proper sit-down. I've held [Thursday at 2:00] for you until tomorrow — just reply to confirm, or tell me a better time. — [Your name], RBC [branch], [phone]'" ] },
   { t:"MyAdvisor — 12 per week", steps:[
     "Start every appointment in MyAdvisor discovery — it is where cards, loans, risk and referrals are found.",
     "Your floor is 12 a week. The branch bar is 80% of appointments, so every one above 12 is ground gained toward it.",
@@ -434,7 +516,7 @@ const WRAP_ITEMS = [
 const KEY = "workgrowth_v1";
 function defState(){ return { weeks:{}, months:{}, days:{}, srfs:[], appts:[], bookedAhead:4,
   focusOverride:null, modeOverride:null, ltChannel:"phone", tf:"m",
-  theme:"ocean", custom:{ bg:"#102A54", card:"#183A6E", accent:"#FFCD5A" }, fontScale:1, undo:[], nps:[] }; }
+  theme:"ocean", custom:{ bg:"#102A54", card:"#183A6E", accent:"#FFCD5A" }, fontScale:1, undo:[], nps:[], opens:[] }; }
 const THEMES = [
   { id:"ocean", name:"Ocean", bg:"#102A54", accent:"#FFCD5A" },
   { id:"midnight", name:"Midnight", bg:"#0A0A0C", accent:"#FF3B30" },
@@ -463,14 +545,15 @@ function uid(){ return Date.now().toString(36) + Math.floor(Math.random()*1e6).t
 function normalize(){ if (!Array.isArray(S.undo)) S.undo = [];
   (S.appts || []).forEach((a, i) => { if (!a.id) a.id = "legacy-a" + i; });
   (S.srfs || []).forEach((x, i) => { if (!x.id) x.id = "legacy-s" + i; });
-  if (!Array.isArray(S.nps)) S.nps = []; S.nps.forEach((x, i) => { if (!x.id) x.id = "legacy-n" + i; }); }
+  if (!Array.isArray(S.nps)) S.nps = []; S.nps.forEach((x, i) => { if (!x.id) x.id = "legacy-n" + i; });
+  if (!Array.isArray(S.opens)) S.opens = []; S.opens.forEach((x, i) => { if (!x.id) x.id = "legacy-o" + i; }); }
 normalize();
 function wByKey(k){ if (!S.weeks[k]) S.weeks[k] = { held:0, booked:0, touches:0, si:0, initiated:0, linked:0, myadvisor:0, volume:0 }; return S.weeks[k]; }
 function mByKey(k){ if (!S.months[k]) S.months[k] = { cards:0, loans:0, risk:0, closed:0 }; return S.months[k]; }
 function pushUndo(u){ S.undo.push(u); if (S.undo.length > 60) S.undo.splice(0, S.undo.length - 60); }
 function describeUndo(u){ return ({ si:"+1 S&I", initiated:"+1 initiated referral", booked:"+1 booked ahead",
   volume:"+$" + (u.amt || 0).toLocaleString("en-CA") + " volume", srf:"SRF " + u.srf,
-  nps:"NPS score " + u.score, appt:"Appointment " + u.srf + " (" + (u.n || 0) + " products)" })[u.k] || "a tap"; }
+  nps:"NPS score " + u.score, open:"Indicated open: " + u.client, appt:"Appointment " + u.srf + " (" + (u.n || 0) + " products)" })[u.k] || "a tap"; }
 function reverseAppt(a){ const wkK = a.wk || dstr(mondayOf(new Date(a.date + "T12:00:00"))), mkK = a.mk || String(a.date).slice(0, 7);
   const w = wByKey(wkK), m = mByKey(mkK);
   w.held = Math.max(0, (+w.held || 0) - 1);
@@ -492,6 +575,7 @@ function applyUndo(u){ if (!u) return;
   else if (u.k === "booked") { S.bookedAhead = Math.max(0, (+S.bookedAhead || 0) - 1); }
   else if (u.k === "srf") { S.srfs = S.srfs.filter(x => x.id !== u.id); }
   else if (u.k === "nps") { S.nps = S.nps.filter(x => x.id !== u.id); }
+  else if (u.k === "open") { S.opens = S.opens.filter(x => x.id !== u.id); }
   else if (u.k === "appt") { const a = S.appts.find(x => x.id === u.id); if (a) reverseAppt(a); } }
 
 /* ============ DATE HELPERS ============ */
@@ -601,6 +685,9 @@ function renderHome(){ const mode = curMode(), day = dy(), w = wk();
   $("monthLine").textContent = "Month: Cards "+(m.cards ?? 0)+"/4 · Loans "+(m.loans ?? 0)+"/3 · Risk "+(m.risk ?? 0)+"/2 · Closed "+(m.closed ?? 0)+"/10";
   const ns = npsStats();
   $("npsLine").textContent = ns ? "NPS: " + ns.n + " surveys · " + ns.p + "% promoters · NPS " + (ns.score >= 0 ? "+" : "") + ns.score : "NPS: no surveys logged yet — target: every survey a 9 or 10.";
+  const op = (S.opens || []).filter(x => !x.done);
+  const urgent = op.filter(x => openStatus(x).day >= 4).length;
+  $("opensLine").textContent = op.length ? "Indicated opens: " + op.length + " waiting" + (urgent ? " · " + urgent + " at day 4+ — call today" : " — follow up on day 2–3") + "." : "Indicated opens: none waiting.";
   const L = focusList(); const low = L.reduce((a,b) => b.ratio < a.ratio ? b : a, L[0]);
   $("tomorrowLine").textContent = low.ratio >= 1 ? "Tomorrow's focus: keep the pace — protect the renewals." : "Tomorrow's focus: "+low.title.toLowerCase()+".";
   const lastU = S.undo && S.undo.length ? S.undo[S.undo.length - 1] : null;
@@ -665,7 +752,7 @@ function renderLog(){ const w = wk(), m = mo();
     S.undo = S.undo.filter(u => !(u.k === "srf" && u.id === b.dataset.srfdel)); save(); renderLog(); renderHome(); });
   document.querySelectorAll("[data-apptdel]").forEach(b => b.onclick = () => { const a = S.appts.find(x => x.id === b.dataset.apptdel); if (!a) return;
     if (!confirm("Delete this appointment? Held, its products and its volume come off your week and month automatically.")) return;
-    reverseAppt(a); save(); renderLog(); renderHome(); }); renderNps(); }
+    reverseAppt(a); save(); renderLog(); renderHome(); }); renderNps(); renderOpens(); }
 
 /* ============ RENDER: RULES ============ */
 function renderRules(){ const q = ($("ruleSearch").value || "").toLowerCase();
@@ -686,6 +773,25 @@ function renderNps(){ const sc = $("npsScores"); if (!sc) return;
   document.querySelectorAll("[data-npsdel]").forEach(b => b.onclick = () => { if (!confirm("Delete this NPS score?")) return;
     S.nps = S.nps.filter(x => x.id !== b.dataset.npsdel);
     S.undo = S.undo.filter(u => !(u.k === "nps" && u.id === b.dataset.npsdel)); save(); renderNps(); renderHome(); }); }
+
+/* ============ INDICATED OPENS ============ */
+const OPEN_PRODUCTS = ["Savings", "NOMI", "PAC", "GIC", "Chequing", "Other"];
+let openSel = null;
+function dayAge(ds){ const a = new Date(ds + "T12:00:00"), b = new Date(); b.setHours(12, 0, 0, 0); return Math.round((b - a) / 86400000); }
+function openStatus(x){ const day = dayAge(x.date) + 1; return { day, left: 5 - day, closed: day > 5 }; }
+function renderOpens(){ const ol = $("openList"); if (!ol) return;
+  $("openProducts").innerHTML = OPEN_PRODUCTS.map(p => '<button class="pchip' + (openSel === p ? " on" : "") + '" data-oprod="' + p + '">' + p + '</button>').join("");
+  document.querySelectorAll("#openProducts .pchip").forEach(c => c.onclick = () => { openSel = c.dataset.oprod; renderOpens(); });
+  const open = (S.opens || []).filter(x => !x.done).sort((a, b) => a.date < b.date ? -1 : 1);
+  ol.innerHTML = open.length ? open.map(x => { const st = openStatus(x);
+    const col = st.closed || st.day >= 4 ? "var(--bad)" : st.day === 3 ? "var(--accent)" : "var(--muted)";
+    const badge = st.closed ? "Window closed — still call; the relationship matters more than the credit" : "Day " + st.day + " of 5" + (st.left > 0 ? " · " + st.left + (st.left === 1 ? " day" : " days") + " left" : " · LAST DAY");
+    return '<div style="padding:4px 0"><b>' + esc(x.client) + '</b> · ' + esc(x.product) + ' · indicated ' + esc(x.date) + '<br><span style="color:' + col + '; font-weight:700">' + badge + '</span> <button class="ghostbtn" data-opendone="' + esc(x.id) + '" style="padding:2px 10px; font-size:12px; margin-left:6px">Done ✓</button><button class="ghostbtn" data-opendel="' + esc(x.id) + '" style="padding:2px 10px; font-size:12px; margin-left:4px">Delete</button></div>'; }).join("")
+    : '<span class="sub">Nothing waiting. When you indicate an open, log it here the same day.</span>';
+  document.querySelectorAll("[data-opendone]").forEach(b => b.onclick = () => { const x = S.opens.find(o => o.id === b.dataset.opendone); if (x) { x.done = true; x.doneDate = dstr(new Date()); } save(); renderOpens(); renderHome(); });
+  document.querySelectorAll("[data-opendel]").forEach(b => b.onclick = () => { if (!confirm("Delete this indicated open?")) return; S.opens = S.opens.filter(o => o.id !== b.dataset.opendel); S.undo = S.undo.filter(u => !(u.k === "open" && u.id === b.dataset.opendel)); save(); renderOpens(); renderHome(); });
+  const dn = (S.opens || []).filter(x => x.done);
+  $("openDone").innerHTML = dn.length ? '<span class="sub">' + dn.length + ' completed — latest: ' + dn.slice(-3).reverse().map(x => esc(x.client) + " (" + esc(x.product) + ")").join(", ") + '</span>' : ""; }
 
 /* ============ STYLE: THEMES + FONT ============ */
 function applyTheme(){ const root = document.documentElement;
@@ -761,6 +867,11 @@ $("npsSave").onclick = () => { if (npsSel == null) { alert("Tap the score first 
   S.nps.push(rec); pushUndo({ k:"nps", id: rec.id, score: rec.score });
   npsSel = null; $("npsNote").value = ""; save(); renderNps(); renderHome();
   alert("NPS score " + rec.score + " saved." + (rec.score >= 9 ? " Promoter — that's the target." : rec.score <= 6 ? " Detractor — if you know who it was, a follow-up call within 48 hours is the play." : " Passive — close, but 7–8 counts for nothing. The gap is usually one unasked thing, or a missing follow-up.")); };
+$("openAdd").onclick = () => { const client = $("openClient").value.trim(); if (!client) { alert("Add the client's name first."); return; } if (!openSel) { alert("Tap the product you indicated."); return; }
+  const rec = { id: uid(), date: dstr(new Date()), client, product: openSel, done: false };
+  S.opens.push(rec); pushUndo({ k:"open", id: rec.id, client });
+  $("openClient").value = ""; openSel = null; save(); renderOpens(); renderHome();
+  alert("Logged: " + client + " — " + rec.product + ". The 5-day clock started today; the follow-up call lands best on day 2–3."); };
 $("saveWeek").onclick = () => { const w = wk();
   w.held = numOrNull($("inHeld").value); w.touches = numOrNull($("inTouches").value); w.si = numOrNull($("inSi").value);
   w.initiated = numOrNull($("inInitiated").value); w.linked = numOrNull($("inLinked").value);
