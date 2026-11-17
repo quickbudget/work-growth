@@ -181,7 +181,7 @@
       <button data-tf="w">Week</button><button data-tf="m" class="on">Month</button><button data-tf="y">Year</button>
     </div>
     <div id="targetCards"></div>
-    <div class="note">Official BIC thresholds are trailing-12-month totals. Counting rule: everything manual — only manual CASPER applications count toward cards and loans; pre-approved counts as zero. S&amp;I counts NEW sales only; renewals count as volume.</div>
+    <div class="note">Official BIC thresholds are trailing-12-month totals. Counting rule: everything manual — only manual CASPER applications count toward cards and loans; pre-approved counts as zero. S&amp;I counts NEW sales only. Renewals count only in the CEAB renewal line — not in S&amp;I, not in total volume.</div>
   </section>
 
   <!-- PLAN -->
@@ -333,7 +333,7 @@ const TARGETS = [
   { id:"volume", name:"Total volume", drive:"week",
     ours:{w:"$769,231", m:"$3,333,333", y:"$40,000,000"}, oursNum:{w:769231, m:3333333, y:40000000},
     bic:{w:"—", m:"—", y:"—"}, bicNum:{w:0, m:0, y:0}, mult:"personal target",
-    note:"No official BIC line. Branch new-money bar inside it: $175K/week. Renewals, PAC volume (365 days) and referral volume (180-day windows) feed this." },
+    note:"No official BIC line. Branch new-money bar inside it: $175K/week. PAC volume (365 days) and referral volume (180-day windows) feed this. Renewals do NOT — renewal volume counts only in the CEAB renewal line." },
   { id:"nps", name:"NPS — survey score per client", drive:"month",
     ours:{w:"9–10", m:"9–10", y:"9–10"}, oursNum:{w:10, m:10, y:10},
     bic:{w:"—", m:"—", y:"—"}, bicNum:{w:0, m:0, y:0}, mult:"promoters only — set 2026-11-15",
@@ -343,7 +343,7 @@ const PLAN = [
   { t:"Appointments — 30 / 35 / 40 per week", steps:[
     "Light touches rebuild the book: Contacts = Light Touches + Appointments, and the book collapsed when light touches ran 1 then 0.",
     "Book-before-they-leave: every appointment ends with the next one booked.",
-    "Protect renewal appointments first — they carry the highest dollars.",
+    "Protect renewal appointments — the client has to talk to someone, and the NEW action beside the renewal is where the money is. The renewal itself counts only in the CEAB renewal line.",
     "Fill weak days from the leads list, worked end-to-end daily — not by hoping.",
     "Measure Friday: held this week + booked for each of the next 3 weeks. A future week under 30 booked is next week's #1 job.",
     "EVERY BOOKING CHANNEL: (1) book-before-they-leave, (2) light touches — reviews, 3-month check-ins, birthdays, (3) leads list / campaign leads worked daily, (4) renewal & maturity lists, (5) customer-service duty conversions — book it while they're in front of you, (6) partner hand-ups + spouse/family joint bookings, (7) assisted-digital follow-ups inside the 5-day window, (8) online bookings confirmed the same day, (9) no-show backfill list, (10) seasonal pushes — TFSA/RRSP season, FHSA, year-end.",
@@ -372,7 +372,7 @@ const PLAN = [
     "BOOK-BEFORE-THEY-LEAVE — the last 2 minutes of every appointment: name the next reason out loud (a maturity date, a pending item, a life event they mentioned), offer two specific times, book it. No open thread? Book the annual review anyway.",
     "LIGHT TOUCHES — where: C360, your assigned clients. Look for: no contact in 90+ days · a product maturing · a PAC flat for a year · birthdays and 3-month check-ins. Pick 15 names at Monday prep, 3 a day, each with ONE specific reason — never 'just checking in'.",
     "LEADS LIST — where: Client Connect / C360 campaign leads. Work it top-down every morning, newest first — a lead called the day it lands books far more often. Look for the product-interest tag and any life-event note; that is your opening line, not the product.",
-    "RENEWAL & MATURITY LISTS — look for: GICs maturing in 30–60 days · mortgage renewals inside 90–120 days · PACs due for review. Call 45–60 days BEFORE maturity, not the week of — the renewal appointment is where the PAC increase and the new GIC live.",
+    "RENEWAL & MATURITY LISTS — look for: GICs maturing in 30–60 days · mortgage renewals inside 90–120 days · PACs due for review. Call 45–60 days BEFORE maturity, not the week of — the renewal itself counts only in the CEAB renewal line; the PAC increase and the new GIC beside it are the S&I solution and the new money.",
     "CS-DUTY CONVERSIONS — during your 5–6 service hours, listen for: 'I should really…' · a fee complaint · a maturing product mentioned in passing · a life change (new job, baby, house). Solve the small thing first, then book the sit-down before they walk away — a name on a sticky note is not a booking.",
     "PARTNER HAND-UPS — at the 8:30 prep, name the client each partner meets today, and ask who they are seeing that needs you. Introduce by name, in person where possible, enter it in C360 the same day. Hand-ups flow toward the advisor who hands out.",
     "ASSISTED-DIGITAL FOLLOW-UPS — your own indications are the list (the tracker in the Log tab). Look for day 2–4 and not finished. One call finishes the open inside the 5-day window — and often books the next appointment too.",
@@ -447,7 +447,7 @@ const PLAN = [
     "Stack 2–3 per face-to-face appointment: funded savings + NOMI Find & Save + new PAC from one conversation.",
     "PAC increase offered at EVERY renewal / review — an increase credits the most recent increaser plus 365 days of increased volume.",
     "Assisted opens: indicate the same day; the client opens digitally within 5 days.",
-    "At a renewal, the NEW action beside it (new GIC, PAC increase, funded savings) is the S&I solution — the renewal itself is volume.",
+    "At a renewal, the NEW action beside it (new GIC, PAC increase, funded savings) is the S&I solution — the renewal itself counts only in the CEAB renewal line, not volume and not S&I.",
     "Weekly sweep: savings accounts nearing day 45 — confirm $100+ is still in.",
     "Traps: savings drained before day 45 = no solution · PAC restarted before 190 days dead = no credit · GPAC excluded." ] },
   { t:"Credit Card — 4 per month, manual only", steps:[
@@ -475,11 +475,11 @@ const PLAN = [
     "Weekly partner follow-up on the open pipeline. Judge initiated weekly; judge closed on a 3-month view.",
     "Traps: SRF mismatch = silently not captured · Sales Platform entries no longer count (C360 only) · mortgage renewals/refinances never count as MS referrals." ] },
   { t:"Total volume — $769K per week", steps:[
-    "Renewals are the rocket ($492K + $266K closed in the last two recorded weeks) — protect and prepare them best.",
+    "Volume is NEW money only. Renewals do NOT count here — the $492K + $266K closed in the last two recorded weeks live in the CEAB renewal line. Renewal appointments still matter: the new action beside the renewal is new money.",
     "Referral volume: one MS/FP referral captures the first sale + all volume within 180 days.",
     "PAC volume: a new PAC pays on the first contribution; an increase pays the increased amount for up to 365 days.",
-    "Track new money ($175K/week branch bar) separately inside the total, so volume is not all renewals.",
-    "One $500K renewal week is not a pace — judge volume on the month." ] },
+    "The branch bar inside this total is new money itself: $175K/week. Log volume only when NEW money lands — a renewal closing is not a volume entry.",
+    "One $500K week is not a pace — judge volume on the month." ] },
 ];
 const RULES = [
   { t:"Manual only (your rule)", s:"Only manual CASPER applications count toward your card and loan benchmarks. Pre-approved counts as zero — serve the client, log zero." },
@@ -495,7 +495,7 @@ const RULES = [
   { t:"Savings: $100 at day 45", s:"A new savings account counts only if $100+ is still held at day 45. Sweep accounts approaching day 45." },
   { t:"New PAC definition", s:"A PAC counts as new only if none existed before, or the old one has been dead 190+ days. A restart before 190 days earns nothing." },
   { t:"PAC increase credit", s:"An increase credits the most recent increaser, with volume on the increased amount for up to 365 days — until a decrease kills it." },
-  { t:"Renewals are volume, not S&I", s:"Renewals (incl. GIC and mortgage renewals) never count as Saving & Investing solutions or MS referrals. The new action taken beside a renewal is what counts." },
+  { t:"Renewals count only in the CEAB renewal line", s:"Renewals (incl. GIC and mortgage renewals) never count as Saving & Investing solutions, MS referrals, or total volume — they count only in the CEAB renewal line. The new action taken beside a renewal is what counts." },
   { t:"Direct Investing caps", s:"Assisted DI sales cap at 6 solutions per client per day; same-category accounts opened the same day count as one." },
   { t:"ADCR deposit cap", s:"Deposit solutions are capped at 4 per client per year." },
   { t:"FP/IRP transfer-in CART", s:"On transfer-in business the planner's side must initiate the Transfer-in CART — if the referring advisor submits it, the referral is not attributed." },
@@ -619,10 +619,10 @@ function focusList(){ const w = wk(), bk = +S.bookedAhead||0, rem = remainingWee
       stat:(+w.initiated||0)+" of 5 initiated this week", bar:(+w.initiated||0)/5, forecast:"",
       why:"Why: closed referrals are decided months ahead by what you initiate now.",
       act:"1 partner intro a day, entered in C360 the same day." },
-    { id:"volume", ratio:(+w.volume||0)/769231, title:"Protect the renewal dollars",
+    { id:"volume", ratio:(+w.volume||0)/769231, title:"Chase new money",
       stat:fmtK(w.volume)+" of $769K this week", bar:(+w.volume||0)/769231, forecast:"",
-      why:"Why: renewals are the rocket — your two biggest weeks were renewal weeks.",
-      act:"Prep renewals first; log every dollar the day it lands." } ]; }
+      why:"Why: volume counts NEW money only — renewals live in the CEAB renewal line, not in this number.",
+      act:"New investments, transfers-in, new lending, PAC volume — log every new dollar the day it lands." } ]; }
 function curFocus(){ const L = focusList();
   if (S.focusOverride) { const f = L.find(x => x.id === S.focusOverride); if (f) return f; }
   return L.reduce((a,b) => b.ratio < a.ratio ? b : a, L[0]); }
@@ -689,7 +689,7 @@ function renderHome(){ const mode = curMode(), day = dy(), w = wk();
   const urgent = op.filter(x => openStatus(x).day >= 4).length;
   $("opensLine").textContent = op.length ? "Indicated opens: " + op.length + " waiting" + (urgent ? " · " + urgent + " at day 4+ — call today" : " — follow up on day 2–3") + "." : "Indicated opens: none waiting.";
   const L = focusList(); const low = L.reduce((a,b) => b.ratio < a.ratio ? b : a, L[0]);
-  $("tomorrowLine").textContent = low.ratio >= 1 ? "Tomorrow's focus: keep the pace — protect the renewals." : "Tomorrow's focus: "+low.title.toLowerCase()+".";
+  $("tomorrowLine").textContent = low.ratio >= 1 ? "Tomorrow's focus: keep the pace — protect the new-money pipeline." : "Tomorrow's focus: "+low.title.toLowerCase()+".";
   const lastU = S.undo && S.undo.length ? S.undo[S.undo.length - 1] : null;
   $("undoNote").textContent = lastU ? "Last tap: " + describeUndo(lastU) + " — Undo takes it back." : "Nothing to undo right now.";
   $("undoBtn").style.opacity = lastU ? "1" : ".45";
