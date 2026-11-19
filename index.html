@@ -637,6 +637,8 @@ function reverseAppt(a){ const wkK = a.wk || dstr(mondayOf(new Date(a.date + "T1
   w.initiated = Math.max(0, (+w.initiated || 0) - counts.initiated);
   m.cards = Math.max(0, (+m.cards || 0) - counts.cards); m.loans = Math.max(0, (+m.loans || 0) - counts.loans);
   m.risk = Math.max(0, (+m.risk || 0) - counts.risk);
+  const solR = counts.si + counts.initiated + counts.cards + counts.loans + counts.risk;
+  if (solR) w.linked = Math.max(0, (+w.linked || 0) - solR);
   if (a.volume) w.volume = Math.max(0, (+w.volume || 0) - a.volume);
   let dropped = false;
   S.srfs = S.srfs.filter(x => { if (x.apptId === a.id) return false;
@@ -803,7 +805,8 @@ function renderHome(){ const mode = curMode(), day = dy(), w = wk();
   document.querySelectorAll("[data-wrap]").forEach(r => r.onclick = () => { const id = r.dataset.wrap; day.wrap[id] = !day.wrap[id]; save(); renderHome(); });
   const was = $("wrapAddSrf"); if (was) was.onclick = ev => { ev.stopPropagation(); $("srfForm").classList.remove("hidden"); renderSrfToday(); $("srfForm").scrollIntoView({ behavior:"smooth" }); };
   // week strip
-  const tiles = [ ["Held", (+w.held||0)+" / 30", (+w.held||0)/30], ["S&I", (+w.si||0)+" / 6", (+w.si||0)/6],
+  const heldN = (+w.held||0), linkN = (+w.linked||0), solR = heldN > 0 ? linkN/heldN : 0;
+  const tiles = [ ["Held", (+w.held||0)+" / 30", (+w.held||0)/30], ["Sol / appt", heldN > 0 ? solR.toFixed(2)+" / 1.0" : "\u2014 / 1.0", solR], ["S&I", (+w.si||0)+" / 6", (+w.si||0)/6],
     ["MyAdvisor", (+w.myadvisor||0)+" / 12", (+w.myadvisor||0)/12], ["Volume", fmtK(w.volume), (+w.volume||0)/769231],
     ["Referrals", (+w.initiated||0)+" / 5", (+w.initiated||0)/5] ];
   $("weekStrip").innerHTML = tiles.map(t => '<div class="tile"><div class="n">'+t[0]+'</div><div class="v">'+t[1]+'</div><div class="bar"><div class="'+(t[2] >= 0.6 ? "green" : "")+'" style="width:'+Math.min(100, Math.max(0, t[2]*100))+'%; background:'+(t[2] >= 0.6 ? "var(--good)" : "var(--bad)")+'"></div></div></div>').join("");
@@ -990,6 +993,8 @@ $("apptSave").onclick = () => { const srf = $("apptSrf").value.trim();
   w.si = (+w.si||0)+counts.si; w.myadvisor = (+w.myadvisor||0)+counts.myadvisor; w.initiated = (+w.initiated||0)+counts.initiated;
   m.cards = (+m.cards||0)+counts.cards; m.loans = (+m.loans||0)+counts.loans; m.risk = (+m.risk||0)+counts.risk;
   if (vol) w.volume = (+w.volume||0)+vol;
+  const sol = counts.si + counts.initiated + counts.cards + counts.loans + counts.risk;
+  if (sol) w.linked = (+w.linked||0)+sol;
   if (!S.srfs.some(x => x.date === rec.date && x.srf === srf)) S.srfs.push({ id: uid(), date: rec.date, srf: srf, kind: "Appointment", apptId: rec.id });
   pushUndo({ k:"appt", id: rec.id, srf: srf, n: rec.products.length });
   const bits = ["Held +1"]; if (counts.si) bits.push("S&I +"+counts.si); if (counts.myadvisor) bits.push("MyAdvisor +1");
