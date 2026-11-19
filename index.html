@@ -52,8 +52,19 @@
   .circle { width: 34px; height: 34px; border-radius: 50%; border: 4px solid var(--muted); flex: 0 0 auto; display:flex; align-items:center; justify-content:center; font-size: 18px; color:#fff; }
   .circle.done { background:#14A078; border-color:#14A078; }
   .quicklog { display:flex; gap: 8px; flex-wrap: wrap; }
-  .qbtn { background:var(--bg); color:var(--bg-ink); border:0; font-weight: 700; font-size: 15px; padding: 10px 14px; border-radius: 999px; cursor: pointer; }
-  .qbtn:active { background:var(--accent); }
+  .qbtn { position: relative; overflow: hidden; background:var(--deep); color:var(--ink); border:1.5px solid var(--line); font-weight: 700; font-size: 15px; padding: 10px 14px; border-radius: 999px; cursor: pointer; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  .qbtn span { position: relative; z-index: 1; }
+  .qbtn::before { content:""; position:absolute; inset:0; width:0; background: var(--accent); opacity:.45; }
+  .qbtn.holding::before { width: 100%; transition: width .55s linear; }
+  .qbtn.held { background: var(--accent); color: var(--accent-ink); }
+  .stephead { display:flex; gap:10px; align-items:center; margin: 22px 0 10px; }
+  .icbox { width:38px; height:38px; border-radius:11px; background:var(--deep); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; flex:none; color: var(--accent); }
+  .icbox svg { width:20px; height:20px; }
+  .stept { font-size:16px; font-weight:800; color:var(--ink); }
+  .stepsub { font-size:12.5px; color:var(--sub); margin-top:1px; line-height:1.35; }
+  .guide { display:flex; gap:10px; align-items:center; background:var(--card); border-radius:14px; padding:11px 12px; margin-bottom:12px; }
+  .guide .gt { font-size:15px; font-weight:700; }
+  .guide .gs { font-size:12.5px; color:var(--sub); margin-top:1px; line-height:1.35; }
   .pchip { background:var(--deep); color:var(--ink2); border: 1px solid var(--line); font-weight: 600; font-size: 14px; padding: 9px 12px; border-radius: 999px; cursor: pointer; }
   .pchip.on { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); font-weight: 700; }
   .strip { display:grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
@@ -119,6 +130,7 @@
   <section id="tab-home">
     <h1 id="homeKicker">TODAY'S FOCUS</h1>
     <div class="dateline"><span class="date" id="homeDate"></span><button class="chip" id="modeChip"></button></div>
+    <div class="stephead"><div class="icbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></div><div><div class="stept">Step 1 &middot; Do the focus</div><div class="stepsub">One thing that matters most today &mdash; done in parts, tap as you go.</div></div></div>
     <div class="focuscard" id="focusCard"></div>
 
     <div id="dayBlock">
@@ -136,14 +148,14 @@
       <div class="rowcard checkrow" id="partnerRow"><div class="circle" id="partnerCircle"></div><div><div class="t">Partner intro at 8:30 prep</div><div class="s">decide 1 name every morning</div></div></div>
       <div class="rowcard checkrow" id="bookRow"><div class="circle" id="bookCircle"></div><div><div class="t">Book-before-they-leave</div><div class="s">every appointment ends with the next one booked</div></div></div>
 
-      <div class="sect">LOG IT IN 2 TAPS</div>
+      <div class="stephead"><div class="icbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 20v-6"/><path d="M12 20V5"/><path d="M18 20v-9"/><path d="M3 20h18"/></svg></div><div><div class="stept">Step 2 &middot; Log it &mdash; hold to add</div><div class="stepsub">Press and hold a button until it fills, then it counts. A plain tap adds nothing &mdash; mistaps can't change your numbers.</div></div></div>
       <div class="quicklog">
-        <button class="qbtn" data-q="appt">+ Appointment</button>
-        <button class="qbtn" data-q="si">+ S&amp;I</button>
-        <button class="qbtn" data-q="initiated">+ Referral</button>
-        <button class="qbtn" data-q="volume">+ Volume</button>
-        <button class="qbtn" data-q="booked">+ Booked</button>
-        <button class="qbtn" data-q="srf">+ SRF</button>
+        <button class="qbtn" data-q="appt"><span>+ Appointment</span></button>
+        <button class="qbtn" data-q="si"><span>+ S&amp;I</span></button>
+        <button class="qbtn" data-q="initiated"><span>+ Referral</span></button>
+        <button class="qbtn" data-q="volume"><span>+ Volume</span></button>
+        <button class="qbtn" data-q="booked"><span>+ Booked</span></button>
+        <button class="qbtn" data-q="srf"><span>+ SRF</span></button>
       </div>
       <button class="ghostbtn" id="undoBtn" style="width:100%; margin-top:10px">↩ Undo last tap</button>
       <div class="note" id="undoNote"></div>
@@ -181,7 +193,7 @@
       <div class="note">Saving counts: held +1 · each S&amp;I product +1 S&amp;I · MyAdvisor +1 · each referral product +1 initiated · card / loan / risk +1 to this month (manual only, as always).</div>
     </div>
 
-    <div class="sect">THIS WEEK — ALL OF IT</div>
+    <div class="stephead"><div class="icbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h6v-6h6v-6h6"/></svg></div><div><div class="stept">Step 3 &middot; Check the week + wrap up</div><div class="stepsub">The week at a glance, the Road to BIC, and the month &mdash; then close the day.</div></div></div>
     <div class="strip" id="weekStrip"></div>
 
     <div class="sect">ROAD TO BIC — TRAILING PACE VS BIC NEEDED</div>
@@ -198,6 +210,7 @@
 
   <!-- TARGETS -->
   <section id="tab-targets" class="hidden">
+    <div class="guide"><div class="icbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 20v-6"/><path d="M12 20V5"/><path d="M18 20v-9"/><path d="M3 20h18"/></svg></div><div><div class="gt">Targets &mdash; your numbers vs BIC</div><div class="gs">The pace you need, by week, month and year.</div></div></div>
     <div class="date" style="margin:4px 0 12px">Our target vs BIC needed</div>
     <div class="segbtns" id="tfToggle">
       <button data-tf="w">Week</button><button data-tf="m" class="on">Month</button><button data-tf="y">Year</button>
@@ -208,6 +221,7 @@
 
   <!-- PLAN -->
   <section id="tab-levels" class="hidden">
+    <div class="guide"><div class="icbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h6v-6h6v-6h6"/></svg></div><div><div class="gt">Levels &mdash; where you stand</div><div class="gs">Your latest readings, the ladder, and the next rung up.</div></div></div>
     <div class="date" style="margin:4px 0 12px">Where you stand — and the next rung up</div>
     <div id="levelsBody"></div>
     <div class="card">
@@ -233,6 +247,7 @@
   </section>
 
   <section id="tab-plan" class="hidden">
+    <div class="guide"><div class="icbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M16 8l-2.5 5.5L8 16l2.5-5.5z"/></svg></div><div><div class="gt">Plan &mdash; plays, field guide, scripts</div><div class="gs">Open one when you need the words or the next move.</div></div></div>
     <div class="date" style="margin:4px 0 12px">How each target gets done</div>
     <div id="planList"></div>
     <div class="card"><h3>The daily system</h3><div class="sub">8:30 prep per client (reason for visit · spotted opportunity · MyAdvisor use · partner to bring in · what's next) → appointments with a stack in each → wrap-up capture before you leave → Friday 10-minute log. Phases: Nov–Jan Stabilise · Feb–Apr Target pace · May–Oct our-target pace is the normal week.</div></div>
@@ -240,6 +255,7 @@
 
   <!-- LOG -->
   <section id="tab-log" class="hidden">
+    <div class="guide"><div class="icbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 013 3L8 19z"/><path d="M14.5 6.5l3 3"/></svg></div><div><div class="gt">Log &mdash; the week, in 10 minutes</div><div class="gs">Friday's numbers, NPS scores, opens to chase, history and backup.</div></div></div>
     <div class="date" style="margin:4px 0 12px">Friday 10 minutes — the week &amp; the month</div>
     <div class="card">
       <h3 id="weekFormTitle">This week</h3>
@@ -300,6 +316,7 @@
 
   <!-- STYLE -->
   <section id="tab-style" class="hidden">
+    <div class="guide"><div class="icbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3.5 4 6 7.2 6 10.5A6 6 0 016 13.5C6 10.2 8.5 7 12 3z"/></svg></div><div><div class="gt">Style &mdash; make it yours</div><div class="gs">Colours and text size. Saved on this phone only.</div></div></div>
     <div class="date" style="margin:4px 0 12px">Themes, colours, font size</div>
     <div class="sect">THEME — TAP TO APPLY</div>
     <div id="themeGrid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px"></div>
@@ -326,6 +343,7 @@
 
   <!-- RULES -->
   <section id="tab-rules" class="hidden">
+    <div class="guide"><div class="icbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg></div><div><div class="gt">Rules &mdash; what counts, what doesn't</div><div class="gs">The crediting cheat sheet. Check here before you log.</div></div></div>
     <div class="date" style="margin:4px 0 12px">The crediting cheat sheet</div>
     <input type="search" id="ruleSearch" placeholder="Search rules — try C360, PAC, day 45…">
     <div id="ruleList" style="margin-top:12px"></div>
@@ -980,14 +998,26 @@ $("apptSave").onclick = () => { const srf = $("apptSrf").value.trim();
   apptSel.clear(); $("apptSrf").value = ""; $("apptVolume").value = ""; renderApptProducts();
   $("apptForm").classList.add("hidden"); save(); renderHome(); renderLog();
   alert("Appointment saved for SRF "+srf+" — "+bits.join(" · ")); };
-document.querySelectorAll("[data-q]").forEach(b => b.onclick = () => { const w = wk(); const q = b.dataset.q; const wkK = dstr(mondayOf(new Date()));
+function quickAction(b){ const w = wk(); const q = b.dataset.q; const wkK = dstr(mondayOf(new Date()));
   if (q === "appt") { $("apptForm").classList.toggle("hidden"); renderApptProducts(); return; }
   if (q === "si") { w.si = (+w.si||0)+1; pushUndo({ k:"si", wk:wkK }); }
   if (q === "initiated") { w.initiated = (+w.initiated||0)+1; pushUndo({ k:"initiated", wk:wkK }); }
   if (q === "booked") { S.bookedAhead = (+S.bookedAhead||0)+1; pushUndo({ k:"booked" }); }
   if (q === "volume") { const v = prompt("Volume $ to add for this week:", "10000"); const n = numOrNull(v == null ? "" : v); if (n) { w.volume = (+w.volume||0)+n; pushUndo({ k:"volume", wk:wkK, amt:n }); } }
   if (q === "srf") { $("srfForm").classList.toggle("hidden"); renderSrfToday(); return; }
-  save(); renderHome(); });
+  save(); renderHome(); }
+function makeHold(btn, fn){ let timer = null, fired = false;
+  const start = e => { e.preventDefault(); fired = false; btn.classList.add("holding");
+    timer = setTimeout(() => { fired = true; btn.classList.remove("holding"); btn.classList.add("held");
+      fn(); setTimeout(() => btn.classList.remove("held"), 400); }, 550); };
+  const cancel = () => { if (timer) { clearTimeout(timer); timer = null; } if (!fired) btn.classList.remove("holding"); };
+  btn.addEventListener("pointerdown", start);
+  btn.addEventListener("pointerup", cancel);
+  btn.addEventListener("pointerleave", cancel);
+  btn.addEventListener("pointercancel", cancel);
+  btn.addEventListener("contextmenu", e => e.preventDefault());
+  btn.addEventListener("click", e => { e.preventDefault(); e.stopPropagation(); }, true); }
+document.querySelectorAll("[data-q]").forEach(b => { if (["si","initiated","booked","volume"].includes(b.dataset.q)) makeHold(b, () => quickAction(b)); else b.onclick = () => quickAction(b); });
 $("undoBtn").onclick = () => { const u = S.undo && S.undo.pop(); if (!u) return; applyUndo(u); save(); renderHome(); renderLog(); };
 document.querySelectorAll("#srfKind button").forEach(b => b.onclick = () => {
   document.querySelectorAll("#srfKind button").forEach(x => x.classList.toggle("on", x === b)); });
