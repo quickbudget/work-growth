@@ -66,6 +66,11 @@
   .dot { width: 18px; height: 18px; border-radius: 50%; background:#5F7396; }
   .dot.g { background:#78DCAA; } .dot.r { background:#FF7878; } .dot.a { background:var(--accent); }
   .monthline { font-size: 14px; color:var(--sub); margin-top: 10px; }
+  .rungs { display:flex; gap:4px; margin-top:8px; }
+  .rung { flex:1; text-align:center; font-size:10px; padding:5px 2px; border-radius:6px; background:rgba(127,127,127,.16); color:var(--muted); line-height:1.3; }
+  .rung.on { background:var(--accent); color:#141414; font-weight:700; }
+  .lvlchip { display:inline-block; padding:2px 10px; border-radius:999px; background:var(--accent); color:#141414; font-weight:700; font-size:12px; white-space:nowrap; }
+  .lvsel { width:100%; padding:9px; border-radius:8px; border:1px solid var(--muted); background:transparent; color:inherit; font:inherit; }
   .tomorrow { font-size: 15px; color:var(--sub); margin-top: 14px; }
   nav { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); width: min(448px, calc(100% - 20px)); background:var(--card); border-radius: 18px; display:flex; padding: 8px; z-index: 10; box-shadow: 0 6px 24px rgba(0,0,0,.35); }
   nav button { flex:1; background:none; border:0; color:var(--sub); font-size: 15px; font-weight: 600; padding: 10px 0; border-radius: 12px; cursor: pointer; }
@@ -170,6 +175,8 @@
     <div class="monthline" id="monthLine"></div>
     <div class="monthline" id="npsLine"></div>
     <div class="monthline" id="opensLine"></div>
+    <div class="monthline" id="levelsLine" style="cursor:pointer"></div>
+    <div class="monthline" id="profLine" style="cursor:pointer"></div>
     <div class="tomorrow" id="tomorrowLine"></div>
   </section>
 
@@ -185,6 +192,32 @@
   </section>
 
   <!-- PLAN -->
+  <section id="tab-levels" class="hidden">
+    <h1>LEVELS</h1>
+    <div class="date" style="margin:4px 0 12px">Where you stand — and the next rung up</div>
+    <div id="levelsBody"></div>
+    <div class="card">
+      <h3>Update readings</h3>
+      <div class="sub">When a new scorecard lands (month-end), type the new readings once — every level and gap recomputes from here.</div>
+      <div style="margin-top:10px"><label class="f">Readings as of</label><input type="text" id="lvAsOf" placeholder="e.g. Nov 2026"></div>
+      <div class="grid2" style="margin-top:10px">
+        <div><label class="f">Appointments / week</label><input type="number" id="lvApptsWk" min="0" step="any"></div>
+        <div><label class="f">Solutions / appointment</label><input type="number" id="lvSolAppt" min="0" step="any"></div>
+        <div><label class="f">Renewal volume / mo (avg $)</label><input type="number" id="lvRenewalMo" min="0"></div>
+        <div><label class="f">Digital clients / week</label><input type="number" id="lvDigitalWk" min="0" step="any"></div>
+        <div><label class="f">Closed referrals / mo (avg)</label><input type="number" id="lvClosedMo" min="0" step="any"></div>
+        <div><label class="f">TSV / month ($)</label><input type="number" id="lvTsv" min="0"></div>
+        <div><label class="f">ADCRS</label><input type="number" id="lvAdcr" min="0"></div>
+        <div><label class="f">TSV level (from scorecard)</label><select id="lvTsvLvl" class="lvsel"><option value="1">L1</option><option value="2">L2</option><option value="3">L3</option><option value="4">L4</option><option value="5">L5</option></select></div>
+        <div><label class="f">ADCRS level (from scorecard)</label><select id="lvAdcrLvl" class="lvsel"><option value="1">L1</option><option value="2">L2</option><option value="3">L3</option><option value="4">L4</option><option value="5">L5</option></select></div>
+      </div>
+      <div class="sub" style="margin:12px 0 6px">Proficiency bands (trailing 12 months)</div>
+      <div class="grid2"><div><label class="f">Appointments</label><select id="lvProf-appts" class="lvsel"><option value="BM">Below Minimum</option><option value="MIN">Minimum</option><option value="TAR">Target</option><option value="BIC">Best in Class</option></select></div><div><label class="f">Saving & Investing</label><select id="lvProf-si" class="lvsel"><option value="BM">Below Minimum</option><option value="MIN">Minimum</option><option value="TAR">Target</option><option value="BIC">Best in Class</option></select></div><div><label class="f">Credit Card</label><select id="lvProf-card" class="lvsel"><option value="BM">Below Minimum</option><option value="MIN">Minimum</option><option value="TAR">Target</option><option value="BIC">Best in Class</option></select></div><div><label class="f">Loans</label><select id="lvProf-loans" class="lvsel"><option value="BM">Below Minimum</option><option value="MIN">Minimum</option><option value="TAR">Target</option><option value="BIC">Best in Class</option></select></div><div><label class="f">Risk / insurance</label><select id="lvProf-risk" class="lvsel"><option value="BM">Below Minimum</option><option value="MIN">Minimum</option><option value="TAR">Target</option><option value="BIC">Best in Class</option></select></div><div><label class="f">Closed Referrals</label><select id="lvProf-ref" class="lvsel"><option value="BM">Below Minimum</option><option value="MIN">Minimum</option><option value="TAR">Target</option><option value="BIC">Best in Class</option></select></div></div>
+      <button class="qbtn" id="lvSave" style="margin-top:14px">Save readings</button>
+      <div class="note">Made a mistake? Home → Undo last tap reverses a readings save.</div>
+    </div>
+  </section>
+
   <section id="tab-plan" class="hidden">
     <h1>THE PLAN</h1>
     <div class="date" style="margin:4px 0 12px">How each target gets done</div>
@@ -292,6 +325,7 @@
 <nav>
   <button data-tab="home" class="on">Home</button>
   <button data-tab="targets">Targets</button>
+  <button data-tab="levels">Levels</button>
   <button data-tab="plan">Plan</button>
   <button data-tab="log">Log</button>
   <button data-tab="rules">Rules</button>
@@ -516,7 +550,7 @@ const WRAP_ITEMS = [
 const KEY = "workgrowth_v1";
 function defState(){ return { weeks:{}, months:{}, days:{}, srfs:[], appts:[], bookedAhead:4,
   focusOverride:null, modeOverride:null, ltChannel:"phone", tf:"m",
-  theme:"ocean", custom:{ bg:"#102A54", card:"#183A6E", accent:"#FFCD5A" }, fontScale:1, undo:[], nps:[], opens:[] }; }
+  theme:"ocean", custom:{ bg:"#102A54", card:"#183A6E", accent:"#FFCD5A" }, fontScale:1, undo:[], nps:[], opens:[], levels: defaultLevels() }; }
 const THEMES = [
   { id:"ocean", name:"Ocean", bg:"#102A54", accent:"#FFCD5A" },
   { id:"midnight", name:"Midnight", bg:"#0A0A0C", accent:"#FF3B30" },
@@ -546,14 +580,18 @@ function normalize(){ if (!Array.isArray(S.undo)) S.undo = [];
   (S.appts || []).forEach((a, i) => { if (!a.id) a.id = "legacy-a" + i; });
   (S.srfs || []).forEach((x, i) => { if (!x.id) x.id = "legacy-s" + i; });
   if (!Array.isArray(S.nps)) S.nps = []; S.nps.forEach((x, i) => { if (!x.id) x.id = "legacy-n" + i; });
-  if (!Array.isArray(S.opens)) S.opens = []; S.opens.forEach((x, i) => { if (!x.id) x.id = "legacy-o" + i; }); }
+  if (!Array.isArray(S.opens)) S.opens = []; S.opens.forEach((x, i) => { if (!x.id) x.id = "legacy-o" + i; });
+  if (!S.levels) S.levels = defaultLevels();
+  if (!S.levels.prof) S.levels.prof = defaultLevels().prof;
+  if (!S.levels.ceab) S.levels.ceab = defaultLevels().ceab;
+  if (!S.levels.asOf) S.levels.asOf = "Oct 2026"; }
 normalize();
 function wByKey(k){ if (!S.weeks[k]) S.weeks[k] = { held:0, booked:0, touches:0, si:0, initiated:0, linked:0, myadvisor:0, volume:0 }; return S.weeks[k]; }
 function mByKey(k){ if (!S.months[k]) S.months[k] = { cards:0, loans:0, risk:0, closed:0 }; return S.months[k]; }
 function pushUndo(u){ S.undo.push(u); if (S.undo.length > 60) S.undo.splice(0, S.undo.length - 60); }
 function describeUndo(u){ return ({ si:"+1 S&I", initiated:"+1 initiated referral", booked:"+1 booked ahead",
   volume:"+$" + (u.amt || 0).toLocaleString("en-CA") + " volume", srf:"SRF " + u.srf,
-  nps:"NPS score " + u.score, open:"Indicated open: " + u.client, appt:"Appointment " + u.srf + " (" + (u.n || 0) + " products)" })[u.k] || "a tap"; }
+  nps:"NPS score " + u.score, open:"Indicated open: " + u.client, levels:"Levels readings update", appt:"Appointment " + u.srf + " (" + (u.n || 0) + " products)" })[u.k] || "a tap"; }
 function reverseAppt(a){ const wkK = a.wk || dstr(mondayOf(new Date(a.date + "T12:00:00"))), mkK = a.mk || String(a.date).slice(0, 7);
   const w = wByKey(wkK), m = mByKey(mkK);
   w.held = Math.max(0, (+w.held || 0) - 1);
@@ -576,6 +614,7 @@ function applyUndo(u){ if (!u) return;
   else if (u.k === "srf") { S.srfs = S.srfs.filter(x => x.id !== u.id); }
   else if (u.k === "nps") { S.nps = S.nps.filter(x => x.id !== u.id); }
   else if (u.k === "open") { S.opens = S.opens.filter(x => x.id !== u.id); }
+  else if (u.k === "levels") { S.levels = u.prev; }
   else if (u.k === "appt") { const a = S.appts.find(x => x.id === u.id); if (a) reverseAppt(a); } }
 
 /* ============ DATE HELPERS ============ */
@@ -585,6 +624,62 @@ function mondayOf(d){ const x = new Date(d); x.setDate(x.getDate() - ((x.getDay(
 function monthKeyOf(d){ return dstr(d).slice(0,7); }
 function fmtK(v){ v = +v||0; return v >= 1000 ? "$"+Math.round(v/1000)+"K" : "$"+v; }
 function esc(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+/* ============ LEVELS ============ */
+function defaultLevels(){ return { asOf:"Oct 2026",
+  prof:{ appts:"MIN", si:"TAR", card:"BM", loans:"BM", risk:"BM", ref:"BM" },
+  ceab:{ apptsWk:16.1, solAppt:0.42, renewalMo:369868, digitalWk:9.3, closedMo:3.0, tsv:420805, tsvLvl:2, adcr:38, adcrLvl:1 } }; }
+const BANDS = ["BM","MIN","TAR","BIC"];
+const BANDNAMES = { BM:"Below Minimum", MIN:"Minimum", TAR:"Target", BIC:"Best in Class" };
+const PROF = [
+  { id:"appts", short:"Appts", name:"Appointments", unit:"/wk avg", bands:["<12","12\u2013<17","17\u201320",">20"], target:"Yours: 30/wk" },
+  { id:"si", short:"S&I", name:"Saving & Investing", unit:"/yr", bands:["<72","72\u2013<120","120\u2013192",">192"], target:"Yours: 312/yr" },
+  { id:"card", short:"Cards", name:"Credit Card", unit:"/yr", bands:["<12","12\u2013<15","15\u201320",">20"], target:"Yours: 48/yr \u2014 manual only" },
+  { id:"loans", short:"Loans", name:"Loans", unit:"/yr", bands:["<6","6\u2013<12","12\u201318",">18"], target:"Yours: 36/yr \u2014 manual only" },
+  { id:"risk", short:"Risk", name:"Risk / insurance", unit:"/yr", bands:["<4","4\u2013<6","6\u201312",">12"], target:"Yours: \u226524/yr" },
+  { id:"ref", short:"Referrals", name:"Closed Referrals", unit:"/yr", bands:["<12","12\u2013<18","18\u201325",">25"], target:"Yours: \u2265120/yr" } ];
+const trim1 = v => String(Math.round(v * 10) / 10);
+const CEAB = [
+  { id:"apptsWk", short:"Appts", name:"Appointments / week", fmt:trim1, cuts:[{c:12,op:">"},{c:16,op:">="},{c:20,op:">="},{c:26,op:">="}], labels:["\u226412",">12\u2013<16","\u226516\u2013<20","\u226520\u2013<26","\u226526"], note:"Your target is 30/wk \u2014 above L5." },
+  { id:"solAppt", short:"Sol/Appt", name:"Solutions / appointment", fmt:v => (+v).toFixed(2), cuts:[{c:0.34,op:">"},{c:0.43,op:">="},{c:0.58,op:">="},{c:0.71,op:">="}], labels:["\u22640.34",">0.34\u2013<0.43","\u22650.43\u2013<0.58","\u22650.58\u2013<0.71","\u22650.71"], note:"A ratio \u2014 stacking moves it, not more appointments." },
+  { id:"renewalMo", short:"Renewal", name:"Renewal volume / month (avg)", fmt:v => "$" + Math.round(v).toLocaleString("en-CA"), cuts:[{c:281562,op:">"},{c:623435,op:">="},{c:1531480,op:">="},{c:2923987,op:">="}], labels:["\u2264$281,562","\u2013$623,435","\u2265$623,435","\u2265$1,531,480","\u2265$2,923,987"], note:"The level uses your monthly average \u2014 one big month pulls it up slowly. Renewals count ONLY here \u2014 never in total volume." },
+  { id:"digitalWk", short:"Digital", name:"Digital clients / week", fmt:trim1, cuts:[{c:5.16,op:">"},{c:7.24,op:">="},{c:10.60,op:">="},{c:13.67,op:">="}], labels:["\u22645.16","\u20137.24","\u22657.24\u2013<10.60","\u226510.60\u2013<13.67","\u226513.67"], note:"" },
+  { id:"closedMo", short:"Partnering", name:"Closed referrals / month (avg)", fmt:trim1, cuts:[{c:0.75,op:">"},{c:1.57,op:">="},{c:3.80,op:">="},{c:6.52,op:">="}], labels:["\u22640.75","\u20131.57","\u22651.57\u2013<3.80","\u22653.80\u2013<6.52","\u22656.52"], note:"Closings lag initiations by 2\u20133 months. Your target \u226510/mo is beyond L5." } ];
+function ceabLevel(m, v){ let L = 1; m.cuts.forEach(ct => { if (ct.op === ">" ? v > ct.c : v >= ct.c) L++; }); return L; }
+function ceabNext(m, v){ const L = ceabLevel(m, v); if (L >= 5) return null; const ct = m.cuts[L - 1]; return { lvl:L + 1, at:ct.c, op:ct.op, gap:ct.c - v }; }
+function renderLevels(){ const L = S.levels, c = L.ceab;
+  let h = '<div class="card"><h3>Readings \u2014 ' + esc(L.asOf || "") + '</h3><div class="sub">Proficiency is trailing 12 months; CEAB levels are trending levels. Medians are tenure- and hours-adjusted \u2014 the bar rises as your tenure normalises.</div></div>';
+  h += '<div class="card"><h3>Section 1 \u2014 Proficiency</h3>' + PROF.map(p => { const b = L.prof[p.id] || "BM", bi = BANDS.indexOf(b);
+    const next = bi < 3 ? 'Next: <b>' + BANDNAMES[BANDS[bi + 1]] + '</b> needs ' + p.bands[bi + 1] + p.unit : 'Top band \u2014 hold it.';
+    return '<div style="margin-top:14px"><div class="vsrow"><span>' + esc(p.name) + '</span><span class="lvlchip">' + BANDNAMES[b] + '</span></div>'
+      + '<div class="rungs">' + p.bands.map((r, i) => '<div class="rung' + (i === bi ? ' on' : '') + '">' + BANDS[i] + '<br>' + esc(r) + p.unit + '</div>').join("") + '</div>'
+      + '<div class="sub" style="margin-top:6px">' + next + ' \u00b7 ' + esc(p.target) + '</div></div>'; }).join("") + '</div>';
+  h += '<div class="card"><h3>Section 2 \u2014 CEAB</h3>' + CEAB.map(m => { const v = +c[m.id] || 0, lv = ceabLevel(m, v), nx = ceabNext(m, v);
+    const next = nx ? 'Next: <b>L' + nx.lvl + '</b> at ' + (nx.op === ">" ? ">" : "\u2265") + m.fmt(nx.at) + ' \u2014 ' + m.fmt(nx.gap) + ' to go' : 'Top level \u2014 hold it.';
+    return '<div style="margin-top:14px"><div class="vsrow"><span>' + esc(m.name) + '</span><span class="lvlchip">Level ' + lv + '</span></div>'
+      + '<div class="sub">You: <b>' + m.fmt(v) + '</b> \u00b7 ' + next + '</div>'
+      + '<div class="rungs">' + m.labels.map((r, i) => '<div class="rung' + (i === lv - 1 ? ' on' : '') + '">L' + (i + 1) + '<br>' + esc(r) + '</div>').join("") + '</div>'
+      + (m.note ? '<div class="note">' + esc(m.note) + '</div>' : '') + '</div>'; }).join("")
+    + '<div style="margin-top:14px"><div class="vsrow"><span>TSV \u2014 sales volume / month</span><span class="lvlchip">Level ' + (c.tsvLvl || 1) + '</span></div>'
+    + '<div class="sub">You: <b>$' + (+c.tsv || 0).toLocaleString("en-CA") + '</b> \u00b7 regional median $833,081 (' + Math.round((+c.tsv || 0) / 833081 * 100) + '% of median)</div>'
+    + '<div class="bar"><div style="width:' + Math.min(100, Math.round((+c.tsv || 0) / 833081 * 100)) + '%; background:var(--accent)"></div></div>'
+    + '<div class="note">Full L1\u2013L5 ladder is not in your framework pages \u2014 tracked against the regional median.</div></div>'
+    + '<div style="margin-top:14px"><div class="vsrow"><span>ADCRS \u2014 acquiring &amp; deepening</span><span class="lvlchip">Level ' + (c.adcrLvl || 1) + '</span></div>'
+    + '<div class="sub">You: <b>' + (+c.adcr || 0) + '</b> \u00b7 regional median 47 (' + Math.round((+c.adcr || 0) / 47 * 100) + '% of median)</div>'
+    + '<div class="bar"><div style="width:' + Math.min(100, Math.round((+c.adcr || 0) / 47 * 100)) + '%; background:var(--accent)"></div></div>'
+    + '<div class="note">Full L1\u2013L5 ladder is not in your framework pages \u2014 tracked against the regional median.</div></div></div>';
+  $("levelsBody").innerHTML = h;
+  const set = (id, v) => { $(id).value = v == null ? "" : v; };
+  set("lvAsOf", L.asOf); set("lvApptsWk", c.apptsWk); set("lvSolAppt", c.solAppt); set("lvRenewalMo", c.renewalMo);
+  set("lvDigitalWk", c.digitalWk); set("lvClosedMo", c.closedMo); set("lvTsv", c.tsv); set("lvAdcr", c.adcr);
+  $("lvTsvLvl").value = String(c.tsvLvl || 2); $("lvAdcrLvl").value = String(c.adcrLvl || 1);
+  PROF.forEach(p => { $("lvProf-" + p.id).value = L.prof[p.id] || "BM"; }); }
+function renderLevelsHome(){ const L = S.levels, c = L.ceab; if (!L || !c) return;
+  const parts = CEAB.map(m => m.short + " L" + ceabLevel(m, +c[m.id] || 0)); parts.push("TSV L" + (c.tsvLvl || 1), "ADCRS L" + (c.adcrLvl || 1));
+  let best = null;
+  CEAB.forEach(m => { const nx = ceabNext(m, +c[m.id] || 0); if (nx) { const r = nx.gap / nx.at; if (!best || r < best.r) best = { r:r, txt:m.name + " \u2014 " + m.fmt(nx.gap) + " to L" + nx.lvl }; } });
+  $("levelsLine").textContent = "Levels (" + (L.asOf || "") + "): " + parts.join(" \u00b7 ") + (best ? " \u2014 closest level-up: " + best.txt + "." : ".") + " Tap for Levels \u2192";
+  $("profLine").textContent = "Proficiency: " + PROF.map(p => p.short + " " + (L.prof[p.id] || "BM")).join(" \u00b7 ") + "."; }
+
 
 function wk(){ const k = dstr(mondayOf(new Date()));
   if (!S.weeks[k]) S.weeks[k] = { held:0, booked:0, touches:0, si:0, initiated:0, linked:0, myadvisor:0, volume:0 };
@@ -688,6 +783,7 @@ function renderHome(){ const mode = curMode(), day = dy(), w = wk();
   const op = (S.opens || []).filter(x => !x.done);
   const urgent = op.filter(x => openStatus(x).day >= 4).length;
   $("opensLine").textContent = op.length ? "Indicated opens: " + op.length + " waiting" + (urgent ? " · " + urgent + " at day 4+ — call today" : " — follow up on day 2–3") + "." : "Indicated opens: none waiting.";
+  renderLevelsHome();
   const L = focusList(); const low = L.reduce((a,b) => b.ratio < a.ratio ? b : a, L[0]);
   $("tomorrowLine").textContent = low.ratio >= 1 ? "Tomorrow's focus: keep the pace — protect the new-money pipeline." : "Tomorrow's focus: "+low.title.toLowerCase()+".";
   const lastU = S.undo && S.undo.length ? S.undo[S.undo.length - 1] : null;
@@ -818,12 +914,24 @@ $("applyCustom").onclick = () => { S.custom = { bg: $("cBg").value, card: $("cCa
 /* ============ EVENTS ============ */
 document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x === b));
-  ["home","targets","plan","log","rules","style"].forEach(t => $("tab-"+t).classList.toggle("hidden", t !== b.dataset.tab));
+  ["home","targets","levels","plan","log","rules","style"].forEach(t => $("tab-"+t).classList.toggle("hidden", t !== b.dataset.tab));
   if (b.dataset.tab === "log") renderLog(); if (b.dataset.tab === "targets") renderTargets();
+  if (b.dataset.tab === "levels") renderLevels();
   if (b.dataset.tab === "style") renderStyle();
   window.scrollTo(0,0); });
 $("modeChip").onclick = () => { const order = [null,"prep","focus","wrap"]; const i = order.indexOf(S.modeOverride);
   S.modeOverride = order[(i+1) % order.length]; save(); renderHome(); };
+$("lvSave").onclick = () => { const prev = JSON.parse(JSON.stringify(S.levels));
+  const num = id => numOrNull($(id).value);
+  const vals = { apptsWk:num("lvApptsWk"), solAppt:num("lvSolAppt"), renewalMo:num("lvRenewalMo"), digitalWk:num("lvDigitalWk"), closedMo:num("lvClosedMo"), tsv:num("lvTsv"), adcr:num("lvAdcr") };
+  for (const k in vals) { if (vals[k] == null || vals[k] < 0) { alert("Check the CEAB numbers \u2014 every field needs a number (0 is fine)."); return; } }
+  Object.assign(S.levels.ceab, vals);
+  S.levels.ceab.tsvLvl = +$("lvTsvLvl").value; S.levels.ceab.adcrLvl = +$("lvAdcrLvl").value;
+  PROF.forEach(p => { S.levels.prof[p.id] = $("lvProf-" + p.id).value; });
+  const ao = $("lvAsOf").value.trim(); if (ao) S.levels.asOf = ao;
+  pushUndo({ k:"levels", prev:prev }); save(); renderLevels(); renderHome(); alert("Readings saved \u2014 levels updated."); };
+$("levelsLine").onclick = () => { document.querySelector('nav button[data-tab="levels"]').click(); };
+$("profLine").onclick = () => { document.querySelector('nav button[data-tab="levels"]').click(); };
 function renderApptProducts(){ $("apptProducts").innerHTML = PRODUCTS.map(p => '<button class="pchip'+(apptSel.has(p.id) ? " on" : "")+'" data-p="'+p.id+'">'+esc(p.label)+'</button>').join("");
   document.querySelectorAll("#apptProducts .pchip").forEach(c => c.onclick = () => { const id = c.dataset.p;
     if (apptSel.has(id)) apptSel.delete(id); else apptSel.add(id); renderApptProducts(); }); }
@@ -889,13 +997,13 @@ $("exportBtn").onclick = () => { const blob = new Blob([JSON.stringify(S, null, 
 $("importBtn").onclick = () => $("importFile").click();
 $("importFile").addEventListener("change", ev => { const file = ev.target.files[0]; if (!file) return;
   file.text().then(t => { try { const data = JSON.parse(t); if (!data.weeks || !data.months) throw new Error("bad file");
-    S = Object.assign(defState(), data); normalize(); applyTheme(); applyFont(); save(); renderHome(); renderTargets(); renderPlan(); renderLog(); renderRules(); alert("Backup imported."); }
+    S = Object.assign(defState(), data); normalize(); applyTheme(); applyFont(); save(); renderHome(); renderTargets(); renderPlan(); renderLog(); renderRules(); renderLevels(); alert("Backup imported."); }
     catch(e){ alert("That file could not be imported."); } }); });
 
 /* ============ INIT ============ */
 wk(); mo(); dy(); syncDayTouches(); save();
 applyTheme(); applyFont();
-renderHome(); renderTargets(); renderPlan(); renderLog(); renderRules(); renderStyle();
+renderHome(); renderTargets(); renderPlan(); renderLog(); renderRules(); renderLevels(); renderStyle();
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
 </script>
 </body>
