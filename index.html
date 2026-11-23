@@ -210,7 +210,7 @@
 
   <!-- TARGETS -->
   <section id="tab-targets" class="hidden">
-    <div class="guide"><div class="icbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 20v-6"/><path d="M12 20V5"/><path d="M18 20v-9"/><path d="M3 20h18"/></svg></div><div><div class="gt">Targets &mdash; your numbers vs BIC</div><div class="gs">The pace you need, by week, month and year.</div></div></div>
+    <div class="guide"><div class="icbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 20v-6"/><path d="M12 20V5"/><path d="M18 20v-9"/><path d="M3 20h18"/></svg></div><div><div class="gt">Targets &mdash; your numbers vs BIC</div><div class="gs">The pace you need &mdash; and where you stand today, updated as you log.</div></div></div>
     <div class="date" style="margin:4px 0 12px">Our target vs BIC needed</div>
     <div class="segbtns" id="tfToggle">
       <button data-tf="w">Week</button><button data-tf="m" class="on">Month</button><button data-tf="y">Year</button>
@@ -841,6 +841,40 @@ function renderSrfToday(){ const el = $("srfToday"); if (!el) return; const list
   el.textContent = list.length ? "Today: " + list.map(x => x.srf+" ("+x.kind+")").join(" · ") : "No SRFs recorded today yet."; }
 
 /* ============ RENDER: TARGETS ============ */
+function fyStart(){ const n = new Date(); const y = n.getMonth() >= 10 ? n.getFullYear() : n.getFullYear() - 1; return new Date(y, 10, 1); }
+function fmtMoney(v){ v = +v || 0; if (v >= 1000000) return "$" + (Math.round(v / 10000) / 100) + "M"; if (v >= 1000) return "$" + Math.round(v / 1000) + "K"; return "$" + v; }
+function sumWeeksF(field, pred){ return Object.entries(S.weeks).filter(([k]) => pred(k)).reduce((a, [, v]) => a + (+v[field] || 0), 0); }
+function sumMonthsF(field, pred){ return Object.entries(S.months).filter(([k]) => pred(k)).reduce((a, [, v]) => a + (+v[field] || 0), 0); }
+function standingHTML(t, tf){
+  const label = tf === "w" ? "THIS WEEK SO FAR" : tf === "m" ? "THIS MONTH SO FAR" : "THIS FISCAL YEAR SO FAR";
+  if (t.id === "nps") {
+    const from = tf === "w" ? dstr(mondayOf(new Date())) : tf === "m" ? monthKeyOf(new Date()) + "-01" : dstr(fyStart());
+    const a = (S.nps || []).filter(x => x.date >= from);
+    if (!a.length) return '<div class="vsrow" style="margin-top:10px"><span>' + label + '</span><b>no surveys yet</b></div><div class="sub">Log each score in the Log tab — this line updates itself.</div>';
+    const P = a.filter(x => x.score >= 9).length, D = a.filter(x => x.score <= 6).length;
+    const pr = Math.round(P / a.length * 100), score = Math.round((P - D) / a.length * 100);
+    return '<div class="vsrow" style="margin-top:10px"><span>' + label + '</span><b>NPS ' + (score >= 0 ? "+" : "") + score + ' · ' + a.length + (a.length === 1 ? " survey" : " surveys") + '</b></div>'
+      + '<div class="bar"><div style="width:' + pr + '%; background:' + (pr === 100 ? "var(--good)" : "var(--accent)") + '"></div></div>'
+      + '<div class="sub">' + pr + '% promoters — the bar is every survey a 9 or 10.</div>'; }
+  const wkF = { appts:"held", myadvisor:"myadvisor", si:"si", volume:"volume" }[t.id];
+  const field = wkF || { cards:"cards", loans:"loans", risk:"risk", closed:"closed" }[t.id];
+  let value, target, lab = label;
+  if (tf === "w") {
+    if (wkF) { value = +wk()[field] || 0; target = t.oursNum.w; }
+    else { value = +mo()[field] || 0; target = t.oursNum.m; lab = "THIS MONTH SO FAR"; } }
+  else if (tf === "m") { target = t.oursNum.m; const mk = monthKeyOf(new Date());
+    value = wkF ? sumWeeksF(field, k => k.slice(0, 7) === mk) : (+mo()[field] || 0); }
+  else { target = t.oursNum.y; const fs = fyStart();
+    value = wkF ? sumWeeksF(field, k => k >= dstr(mondayOf(fs))) : sumMonthsF(field, k => k >= dstr(fs).slice(0, 7)); }
+  const fmt = t.id === "volume" ? fmtMoney : (v => "" + Math.round(v));
+  const left = target - value;
+  const pct = target > 0 ? Math.min(100, Math.round(value / target * 100)) : 0;
+  const sub = value <= 0 ? "Nothing logged yet — this fills in as you log each day."
+    : left > 0 ? fmt(left) + " to go to " + ((t.id === "risk" || t.id === "closed") ? "the floor." : "the target.")
+    : "Target reached" + (left < 0 ? " — " + fmt(-left) + " over." : ".");
+  return '<div class="vsrow" style="margin-top:10px"><span>' + lab + '</span><b>' + fmt(value) + ' of ' + fmt(target) + '</b></div>'
+    + '<div class="bar"><div style="width:' + pct + '%; background:' + (left <= 0 ? "var(--good)" : "var(--accent)") + '"></div></div>'
+    + '<div class="sub">' + sub + '</div>'; }
 function renderTargets(){ const tf = S.tf;
   document.querySelectorAll("#tfToggle button").forEach(b => b.classList.toggle("on", b.dataset.tf === tf));
   $("targetCards").innerHTML = TARGETS.map(t => { const ours = t.oursNum[tf], bic = t.bicNum[tf];
@@ -848,6 +882,7 @@ function renderTargets(){ const tf = S.tf;
     return '<div class="card"><h3>'+esc(t.name)+'</h3><div class="sub">'+esc(t.mult)+'</div>'
       + '<div class="vsrow"><span>OUR TARGET</span><b>'+esc(t.ours[tf])+'</b></div><div class="bar"><div style="width:'+(ours/scale*100)+'%; background:var(--accent)"></div></div>'
       + '<div class="vsrow"><span>BIC NEEDED</span><b>'+esc(t.bic[tf])+'</b></div><div class="bar"><div style="width:'+(bic/scale*100)+'%; background:var(--muted)"></div></div>'
+      + standingHTML(t, tf)
       + '<div class="sub" style="margin-top:8px">'+esc(t.note)+'</div></div>'; }).join(""); }
 
 /* ============ RENDER: PLAN ============ */
